@@ -21,10 +21,6 @@ jobs:
       - name: Setup Android environment
         uses: android-actions/setup-android@v2
 
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install ghc libghc-mustache-dev libghc-shake-dev
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
@@ -54,8 +50,7 @@ jobs:
           plugin_description = Fcitx 5 Pinyin Dictionary from zh.wikipedia.org
           plugin_api_version = 0.1
           EOF
-          ghc-pkg list
-          runghc Main.hs
+          stack exec --package shake --package mustache -- runghc Main.hs
           mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
           curl -vL https://github.com/felixonmars/fcitx5-pinyin-zhwiki/releases/download/$_converterver/zhwiki-$_ver.dict -o out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/zhwiki-$_ver.dict
           cd out
