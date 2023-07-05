@@ -1,0 +1,48 @@
+name: Check moegirl Update
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 */2 * * *"
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    outputs:
+      fdroid: ${{ steps.set-fdroid.outputs.fdroid }}
+      gh: ${{ steps.set-gh.outputs.gh }}
+    steps:
+      - id: set-fdroid
+        name: Download version from fdroid
+        run: |
+          X=$(curl -s https://f5a.typed.icu/fdroid/repo/index-v1.json | jq -r '.packages."org.fcitx.fcitx5.android.plugin.pinyin_moegirl"[0].versionCode')
+          echo "fdroid=$X" >> $GITHUB_OUTPUT
+      - id: set-gh
+        name: Download version from github
+        run: |
+          X=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/outloudvi/mw2fcitx/releases/latest | jq -r '.name')
+          echo "gh=$X" >> $GITHUB_OUTPUT
+
+  check:
+    runs-on: ubuntu-latest
+    needs: download
+    steps:
+      - name: Check
+        env:
+          FDROID: ${{needs.download.outputs.fdroid}}
+          GH: ${{needs.download.outputs.gh}}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "fdroid=$FDROID"
+          echo "gh=$ARCHLINUX"
+          if [ "$FDROID" != "$GH" ]; then
+            echo "fdroid and github version not match"
+            gh workflow run build-moegirl.yml -f version=$GH
+          else
+            echo "skip build" 
+          fi

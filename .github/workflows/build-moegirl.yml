@@ -1,4 +1,4 @@
-name: Build and deploy zhwiki
+name: Build and deploy moegirl
 
 on:
   workflow_dispatch:
@@ -42,8 +42,8 @@ jobs:
           _converter: 0.2.4
         run: |
           cat << EOF > build.cfg
-          project_name = fcitx5-android-plugin-pinyin-zhwiki
-          package_name = org.fcitx.fcitx5.android.plugin.pinyin_zhwiki
+          project_name = fcitx5-android-plugin-pinyin-moegirl
+          package_name = org.fcitx.fcitx5.android.plugin.pinyin_moegirl
           aboutlibraries_version = 10.7.0
           main_version = 49f75dd319
           desugarJDKLibs_version = 2.0.3
@@ -52,13 +52,13 @@ jobs:
           build_version_name = $_ver
           version_code = $_ver
           build_commit_hash = unknown
-          app_name_debug = Fcitx5 for Android (zhwiki dict | Debug)
-          app_name_release = Fcitx5 for Android (zhwiki dict)
-          plugin_description = Fcitx 5 Pinyin Dictionary from zh.wikipedia.org
+          app_name_debug = Fcitx5 for Android (moegirl dict | Debug)
+          app_name_release = Fcitx5 for Android (moegirl dict)
+          plugin_description = Fcitx 5 Pinyin Dictionary from zh.moegirl.org.cn
           plugin_api_version = 0.1
           EOF
           stack exec --package shake --package mustache -- runghc Main.hs
           mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
-          curl -vL https://github.com/felixonmars/fcitx5-pinyin-zhwiki/releases/download/$_converterver/zhwiki-$_ver.dict -o out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/zhwiki-$_ver.dict
+          curl -vL https://github.com/outloudvi/mw2fcitx/releases/download/$_ver/moegirl.dict -o out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/moegirl-$_ver.dict
           cd out
           ./gradlew assembleRelease
