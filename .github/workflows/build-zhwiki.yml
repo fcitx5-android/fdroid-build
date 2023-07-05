@@ -45,7 +45,7 @@ jobs:
           ZHWIKI_DICT_VER: "${{ inputs.version }}"
           ZHWIKI_CONVERTER_VER: "0.2.4"
         working-directory: plugin-scaffold
-        run: scripts/build-zhwiki.sh
+        run: ${GITHUB_WORKSPACE}/scripts/build-zhwiki.sh
 
       - name: Sign APK
         env:

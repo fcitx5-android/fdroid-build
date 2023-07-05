@@ -44,7 +44,7 @@ jobs:
         env:
           MOEGIRL_VER: ${{ inputs.version }}
         working-directory: plugin-scaffold
-        run: scripts/build-moegirl.sh
+        run: ${GITHUB_WORKSPACE}/scripts/build-moegirl.sh
 
       - name: Sign APK
         env:
