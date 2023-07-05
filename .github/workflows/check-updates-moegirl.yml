@@ -41,7 +41,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "fdroid=$FDROID"
-          echo "gh=$ARCHLINUX"
+          echo "ghv=$GHV"
           if [ "$FDROID" != "$GHV" ]; then
             echo "fdroid and github version not match"
             gh workflow run build-moegirl.yml -f version=$GHV
