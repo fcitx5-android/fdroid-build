@@ -32,10 +32,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: fcitx5-android/plugin-scaffold
-      
+
       - name: Build
         env:
-          VERSION: ${{ inputs.version }}
+          _ver: ${{ inputs.version }}
+          _converter: 0.2.4
         run: |
           cat << EOF > build.cfg
           project_name = fcitx5-android-plugin-pinyin-zhwiki
@@ -53,6 +54,7 @@ jobs:
           plugin_description = Fcitx 5 Pinyin Dictionary from zh.wikipedia.org
           plugin_api_version = 0.1
           EOF
+          ghc-pkg list
           runghc Main.hs
           mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
           curl -vL https://github.com/felixonmars/fcitx5-pinyin-zhwiki/releases/download/$_converterver/zhwiki-$_ver.dict -o out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/zhwiki-$_ver.dict

@@ -15,10 +15,12 @@ jobs:
       archlinux: ${{ steps.set-archlinux.outputs.archlinux }}
     steps:
       - id: set-fdroid
+        name: Download version from fdroid
         run: |
           X=$(curl -s https://f5a.typed.icu/fdroid/repo/index-v1.json | jq -r '.packages."org.fcitx.fcitx5.android.plugin.pinyin_zhwiki"[0].versionCode')
           echo "fdroid=$X" >> $GITHUB_OUTPUT
       - id: set-archlinux
+        name: Download version from archlinux [extra]
         run: |
           X=$(curl -s https://archlinux.org/packages/extra/any/fcitx5-pinyin-zhwiki/json/ | jq -r '.pkgver')
           echo "archlinux=${X:6}" >> $GITHUB_OUTPUT
