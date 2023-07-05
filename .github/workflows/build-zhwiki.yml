@@ -60,9 +60,10 @@ jobs:
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete
-          path: "${{ steps.sign.outputs.signed }}"
+          path: "${{ steps.sign.outputs.signed_path }}"
           remote_path: "${{ steps.sign.outputs.remote_path }}"
           remote_host: ${{ secrets.DEPLOY_HOST }}
           remote_port: ${{ secrets.DEPLOY_PORT }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_key: ${{ secrets.DEPLOY_KEY }}
+

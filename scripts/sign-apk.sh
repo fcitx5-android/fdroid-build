@@ -21,5 +21,6 @@ echo "${SIGN_KEY_BASE64}" | base64 -d > "${KEY_FILE}"
 
 rm "${KEY_FILE}"
 echo "$signed"
-echo "signed=$signed" >> $GITHUB_OUTPUT
-echo "remote_path=fdroid/repo/${signed##*/}" >> $GITHUB_OUTPUT
+signed_name="${signed##*/}"
+echo "signed_path=plugin-scaffold/out/$signed_name" >> $GITHUB_OUTPUT
+echo "remote_path=fdroid/repo/$signed_name" >> $GITHUB_OUTPUT
