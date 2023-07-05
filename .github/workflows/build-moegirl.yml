@@ -52,4 +52,4 @@ jobs:
           SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
           SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
         working-directory: plugin-scaffold
-        run: ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/app/build/outputs/apk/release/*.apk
+        run: ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/*.apk

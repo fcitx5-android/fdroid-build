@@ -10,7 +10,7 @@ aligned="${unsigned/.apk/-aligned.apk}"
 signed="${unsigned/-unsigned.apk/.apk}"
 
 KEY_FILE=$(mktemp)
-base64 -d "${SIGN_KEY_BASE64}" > "${KEY_FILE}"
+echo "${SIGN_KEY_BASE64}" | base64 -d > "${KEY_FILE}"
 
 "$ZIPALIGN_BIN" -p 4 "$unsigned" "$aligned"
 "$APKSIGNER_BIN" sign --out "$signed" \
