@@ -48,4 +48,9 @@ jobs:
         run: scripts/build-zhwiki.sh
 
       - name: Sign APK
-        run: scripts/sign-apk.sh plugin-scaffold/out/app/build/outputs/apk/release/*.apk
+        env:
+          SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
+          SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
+          SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
+        working-directory: plugin-scaffold
+        run: ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/app/build/outputs/apk/release/*.apk
