@@ -27,7 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: download
     steps:
-      - env:
+      - name: Check
+        env:
           FDROID: ${{needs.download.outputs.fdroid}}
           ARCHLINUX: ${{needs.download.outputs.archlinux}}
           GH_TOKEN: ${{ github.token }}
