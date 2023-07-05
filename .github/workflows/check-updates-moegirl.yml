@@ -21,6 +21,8 @@ jobs:
           echo "fdroid=$X" >> $GITHUB_OUTPUT
       - id: set-gh
         name: Download version from github
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           X=$(gh api \
               -H "Accept: application/vnd.github+json" \
