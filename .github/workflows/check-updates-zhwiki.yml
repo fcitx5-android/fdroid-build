@@ -1,0 +1,41 @@
+name: Check zhwiki Update
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 */2 * * *"
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    outputs:
+      fdroid: ${{ steps.set-fdroid.outputs.fdroid }}
+      archlinux: ${{ steps.set-archlinux.outputs.archlinux }}
+    steps:
+      - id: set-fdroid
+        run: |
+          X=$(curl -s https://f5a.typed.icu/fdroid/repo/index-v1.json | jq -r '.packages."org.fcitx.fcitx5.android.plugin.pinyin_zhwiki"[1].versionCode')
+          echo "fdroid=$X" >> $GITHUB_OUTPUT
+      - id: set-archlinux
+        run: |
+          X=$(curl -s https://archlinux.org/packages/extra/any/fcitx5-pinyin-zhwiki/json/ | jq -r '.pkgver')
+          echo "archlinux=${X:5}" >> $GITHUB_OUTPUT
+
+  check:
+    runs-on: ubuntu-latest
+    needs: download
+    steps:
+      - env:
+          FDROID: ${{needs.download.outputs.fdroid}}
+          ARCHLINUX: ${{needs.download.outputs.archlinux}}
+        run: |
+          echo "fdroid=$FDROID"
+          echo "archlinux=$ARCHLINUX"
+          if [ "$FDROID" != "$ARCHLINUX" ]; then
+            echo "fdroid and archlinux version not match"
+            gh workflow run build-zhwiki.yml -f version=$ARCHLINUX
+          else
+            echo "skip build" 
+          fi
