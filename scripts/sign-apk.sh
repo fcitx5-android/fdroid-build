@@ -23,4 +23,4 @@ rm "${KEY_FILE}"
 echo "$signed"
 signed_name="${signed##*/}"
 echo "signed_path=plugin-scaffold/out/$signed_name" >> $GITHUB_OUTPUT
-echo "remote_path=fdroid/repo/$signed_name" >> $GITHUB_OUTPUT
+echo "remote_path=web/fdroid/repo/$signed_name" >> $GITHUB_OUTPUT

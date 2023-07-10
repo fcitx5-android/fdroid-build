@@ -1,0 +1,29 @@
+name: Update fdroid repo
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason"
+        required: true
+        type: string
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v0.1.10
+        name: Execute fdroid update
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            cd web/fdroid
+            fdroid update
+      - name: Send Telegram message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            F-Droid repo updated: ${{ github.event.inputs.reason }}
