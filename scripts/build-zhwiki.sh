@@ -3,11 +3,11 @@
 cat << EOF > build.cfg
 project_name = fcitx5-android-plugin-pinyin-zhwiki
 package_name = org.fcitx.fcitx5.android.plugin.pinyin_zhwiki
-aboutlibraries_version = 10.8.0
-main_version = 0.0.6-29-g00034d9
+aboutlibraries_version = 10.8.3
+main_version = 0.0.7
 desugarJDKLibs_version = 2.0.3
-kotlin_version = 1.8.22
-android_version = 8.0.2
+kotlin_version = 1.9.0
+android_version = 8.1.1
 build_version_name = $ZHWIKI_DICT_VER
 version_code = $ZHWIKI_DICT_VER
 build_commit_hash = unknown
