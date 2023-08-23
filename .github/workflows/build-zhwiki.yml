@@ -55,7 +55,14 @@ jobs:
           SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
         working-directory: plugin-scaffold
         run: ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/*.apk
-      - name: Upload apk
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: moegirl
+          path: "${{ steps.sign.outputs.signed_path }}"
+
+      - name: Deploy apk
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete
@@ -65,6 +72,7 @@ jobs:
           remote_port: ${{ secrets.DEPLOY_PORT }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_key: ${{ secrets.DEPLOY_KEY }}
+
       - name: Update repo
         env:
           GH_TOKEN: ${{ github.token }}
