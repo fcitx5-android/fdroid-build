@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/env bash
 
-BUILD_TOOLS_ROOT="${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION:-33.0.2}"
+BUILD_TOOLS_ROOT="${ANDROID_SDK_ROOT}/build-tools/${BUILD_TOOLS_VERSION}"
 
 ZIPALIGN_BIN="${BUILD_TOOLS_ROOT}/zipalign"
 APKSIGNER_BIN="${BUILD_TOOLS_ROOT}/apksigner"
