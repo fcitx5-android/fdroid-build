@@ -12,34 +12,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Setup Android environment
-        uses: android-actions/setup-android@v2
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-
-      - name: Cache stack
-        id: cache-stack
-        uses: actions/cache@v3
-        with:
-          path: ~/.stack
-          key: ${{ runner.os }}-stack-global
-
       - name: Checkout scripts
         uses: actions/checkout@v3
-
       - name: Checkout plugin-scaffold
         uses: actions/checkout@v3
         with:
           path: plugin-scaffold
           repository: fcitx5-android/plugin-scaffold
-
+      - uses: cachix/install-nix-action@v22
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v12
+        with:
+            name: fcitx5-android
+            authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build Release APK
         env:
           MOEGIRL_VER: ${{ inputs.version }}
@@ -53,7 +39,7 @@ jobs:
           SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
           SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
         working-directory: plugin-scaffold
-        run: ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/*.apk
+        run: nix develop .#noAS --command ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/*.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3

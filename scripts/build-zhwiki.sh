@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 cat << EOF > build.cfg
 project_name = fcitx5-android-plugin-pinyin-zhwiki
@@ -17,10 +17,12 @@ plugin_description = Fcitx 5 Pinyin Dictionary from zh.wikipedia.org
 plugin_api_version = 0.1
 EOF
 
-stack exec --package shake --package mustache -- runghc Main.hs
+nix develop .#noAS --command runghc Main.hs
+# nix flake needs git add
+git add -f out
 mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
 curl -L "https://github.com/felixonmars/fcitx5-pinyin-zhwiki/releases/download/${ZHWIKI_CONVERTER_VER}/zhwiki-${ZHWIKI_DICT_VER}.dict" \
   -o "out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/zhwiki-${ZHWIKI_DICT_VER}.dict"
 cd out
-./gradlew assembleRelease
+nix develop .#noAS --command ./gradlew assembleRelease
 mv app/build/outputs/apk/release/*.apk "org.fcitx.fcitx5.android.plugin.pinyin_zhwiki-${ZHWIKI_DICT_VER}-unsigned.apk"
