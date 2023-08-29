@@ -17,7 +17,7 @@ plugin_description = Fcitx 5 Pinyin Dictionary from zh.moegirl.org.cn
 plugin_api_version = 0.1
 EOF
 
-nix develop .#noAS --command runghc Main.hs
+nix develop --command runghc Main.hs
 # nix flake needs git add
 git add -f out
 mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
