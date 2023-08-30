@@ -1,7 +1,6 @@
 name: Build and deploy moegirl
 
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       version:
@@ -49,7 +48,6 @@ jobs:
           path: "${{ steps.sign.outputs.signed_path }}"
 
       - name: Deploy apk
-        if: github.ref == 'refs/heads/master'
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete
@@ -61,7 +59,6 @@ jobs:
           remote_key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Update repo
-        if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run update-repo.yml -f reason="moegirl updated to ${{ inputs.version }}" --repo ${{ github.repository }}
