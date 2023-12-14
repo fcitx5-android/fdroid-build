@@ -3,11 +3,11 @@
 cat << EOF > build.cfg
 project_name = fcitx5-android-plugin-pinyin-moegirl
 package_name = org.fcitx.fcitx5.android.plugin.pinyin_moegirl
-aboutlibraries_version = 10.8.3
-main_version = 0.0.7
-desugarJDKLibs_version = 2.0.3
-kotlin_version = 1.9.0
-android_version = 8.1.1
+aboutlibraries_version = 10.9.2
+main_version = 0.0.8-7-ga2a67fc
+desugarJDKLibs_version = 2.0.4
+kotlin_version = 1.9.20
+android_version = 8.2.0
 build_version_name = $MOEGIRL_VER
 version_code = $MOEGIRL_VER
 build_commit_hash = unknown
