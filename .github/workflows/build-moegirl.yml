@@ -13,16 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout scripts
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Checkout plugin-scaffold
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: plugin-scaffold
           repository: fcitx5-android/plugin-scaffold
-      - uses: cachix/install-nix-action@v22
+      - uses: cachix/install-nix-action@v26
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
             name: fcitx5-android
             authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
@@ -42,13 +42,13 @@ jobs:
         run: nix develop ./out#noAS --command ${GITHUB_WORKSPACE}/scripts/sign-apk.sh ./out/*.apk
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: moegirl
           path: "${{ steps.sign.outputs.signed_path }}"
 
       - name: Deploy apk
-        uses: burnett01/rsync-deployments@6.0.0
+        uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete
           path: "${{ steps.sign.outputs.signed_path }}"
