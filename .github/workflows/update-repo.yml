@@ -10,7 +10,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v0.1.10
+      - uses: appleboy/ssh-action@v1.0.3
         name: Execute fdroid update
         with:
           host: ${{ secrets.DEPLOY_HOST }}
