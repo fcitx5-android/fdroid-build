@@ -20,7 +20,8 @@ jobs:
         name: Get version from archlinux [extra]
         run: |
           X=$(curl -s https://archlinux.org/packages/extra/any/fcitx5-pinyin-zhwiki/json/ | jq -r '.pkgver')
-          echo "version=${X:6}" >> $GITHUB_OUTPUT
+          [[ $X =~ \.[0-9]*$ ]] && echo "converter=${X//$BASH_REMATCH/}" >> $GITHUB_OUTPUT
+          [[ $X =~ [0-9]*$ ]] && echo "version=$BASH_REMATCH" >> $GITHUB_OUTPUT
       - name: Check if needs update
         env:
           GH_TOKEN: ${{ github.token }}

@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+set -euxo pipefail
+
 cat << EOF > build.cfg
 project_name = fcitx5-android-plugin-pinyin-zhwiki
 package_name = org.fcitx.fcitx5.android.plugin.pinyin_zhwiki

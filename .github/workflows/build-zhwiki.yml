@@ -3,6 +3,10 @@ name: Build and deploy zhwiki
 on:
   workflow_dispatch:
     inputs:
+      converter:
+        description: "Converter version"
+        required: true
+        type: string
       version:
         description: "Dict version"
         required: true
@@ -28,8 +32,8 @@ jobs:
             authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build Release APK
         env:
+          ZHWIKI_CONVERTER_VER: "${{ inputs.converter }}"
           ZHWIKI_DICT_VER: "${{ inputs.version }}"
-          ZHWIKI_CONVERTER_VER: "0.2.5"
         working-directory: plugin-scaffold
         run: ${GITHUB_WORKSPACE}/scripts/build-zhwiki.sh
       - name: Sign APK
