@@ -26,12 +26,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          CONVERTER="${{ steps.fdroid.outputs.converter }}"
           FDROID="${{ steps.fdroid.outputs.version }}"
           ARCHLINUX="${{ steps.archlinux.outputs.version }}"
           echo "FDROID=$FDROID; ARCHLINUX=$ARCHLINUX"
           if [ "$FDROID" != "$ARCHLINUX" ]; then
             echo "fdroid and archlinux version not match"
-            gh workflow run build-zhwiki.yml -f version=$ARCHLINUX --repo ${{ github.repository }}
+            gh workflow run build-zhwiki.yml -f converter=$CONVERTER -f version=$ARCHLINUX --repo ${{ github.repository }}
           else
             echo "skip build" 
           fi
