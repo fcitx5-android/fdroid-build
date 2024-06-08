@@ -1,0 +1,41 @@
+name: Check minecraft Update
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - id: fdroid
+        name: Get version from fdroid
+        run: |
+          X=$(curl -s https://f5a.torus.icu/fdroid/repo/index-v1.json | jq -r '.packages."org.fcitx.fcitx5.android.plugin.pinyin_minecraft"[0].versionCode')
+          echo "version=$X" >> $GITHUB_OUTPUT
+      - id: gh
+        name: Get version from github
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          X=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/oldherl/fcitx5-pinyin-minecraft/releases/latest | jq -r '.tag_name')
+          echo "version=$X" >> $GITHUB_OUTPUT
+      - name: Check if needs update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FDROID="${{ steps.fdroid.outputs.version }}"
+          GHV="${{ steps.gh.outputs.version }}"
+          echo "FDROID=$FDROID; GHV=$GHV"
+          if [ "$FDROID" != "$GHV" ]; then
+            echo "fdroid and github version not match"
+            gh workflow run build-minecraft.yml -f version=$GHV --repo ${{ github.repository }}
+          else
+            echo "skip build" 
+          fi
