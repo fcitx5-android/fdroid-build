@@ -24,9 +24,12 @@ jobs:
           X=$(gh api \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              /repos/oldherl/fcitx5-pinyin-minecraft/releases/latest | jq -r '.tag_name')
-          # drop 0.1. prefix
-          echo "version=${X:4}" >> $GITHUB_OUTPUT
+              /repos/oldherl/fcitx5-pinyin-minecraft/releases/latest)
+          TAG=$(jq -r .tag_name <<<$X)
+          DATE=$(jq -r .published_at <<<$X)
+          TIMESTAMP=$(date -d "$DATE" +%s)
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
       - name: Check if needs update
         env:
           GH_TOKEN: ${{ github.token }}
@@ -36,7 +39,8 @@ jobs:
           echo "FDROID=$FDROID; GHV=$GHV"
           if [ "$FDROID" != "$GHV" ]; then
             echo "fdroid and github version not match"
-            gh workflow run build-minecraft.yml -f version=$GHV --repo ${{ github.repository }}
+            TIMESTAMP="${{ steps.gh.outputs.timestamp }}"
+            gh workflow run build-minecraft.yml -f tag=$GHV -f version=$TIMESTAMP --repo ${{ github.repository }}
           else
             echo "skip build" 
           fi

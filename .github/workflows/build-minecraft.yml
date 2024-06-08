@@ -3,8 +3,12 @@ name: Build and deploy minecraft
 on:
   workflow_dispatch:
     inputs:
+      tag:
+        description: "Release tag name"
+        required: true
+        type: string
       version:
-        description: "Dict version"
+        description: "Apk version code"
         required: true
         type: string
 
@@ -28,6 +32,7 @@ jobs:
             authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build Release APK
         env:
+          MINECRAFT_TAG: ${{ inputs.tag }}
           MINECRAFT_VER: ${{ inputs.version }}
         working-directory: plugin-scaffold
         run: ${GITHUB_WORKSPACE}/scripts/build-minecraft.sh

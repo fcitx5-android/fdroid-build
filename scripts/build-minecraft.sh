@@ -10,7 +10,7 @@ main_version = 0.0.9
 desugarJDKLibs_version = 2.0.4
 kotlin_version = 1.9.23
 android_version = 8.3.2
-build_version_name = $MINECRAFT_VER
+build_version_name = $MINECRAFT_TAG
 version_code = $MINECRAFT_VER
 build_commit_hash = unknown
 app_name_debug = Fcitx5 for Android (minecraft dict | Debug)
@@ -24,8 +24,8 @@ nix run
 rm .gitignore
 git add .
 mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
-curl -L "https://github.com/oldherl/fcitx5-pinyin-minecraft/releases/download/${MINECRAFT_VER}/minecraft-cn.dict" \
-  -o "out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/minecraft-${MINECRAFT_VER}.dict"
+curl -L "https://github.com/oldherl/fcitx5-pinyin-minecraft/releases/download/${MINECRAFT_TAG}/minecraft-cn.dict" \
+  -o "out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/minecraft-${MINECRAFT_TAG}.dict"
 cd out
 nix develop .#noAS --command ./gradlew assembleRelease
-mv app/build/outputs/apk/release/*.apk "org.fcitx.fcitx5.android.plugin.pinyin_minecraft-${MINECRAFT_VER}-unsigned.apk"
+mv app/build/outputs/apk/release/*.apk "org.fcitx.fcitx5.android.plugin.pinyin_minecraft-${MINECRAFT_TAG}-unsigned.apk"
