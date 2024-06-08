@@ -1,4 +1,4 @@
-name: Check minecraft Update
+name: Check minecraft-cn dict Update
 on:
   workflow_dispatch:
   push:
