@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -10,10 +11,12 @@ module FDroidVersion where
 import Config (buildDir)
 import Control.Monad (void)
 import qualified Data.Aeson as A
+import qualified Data.Aeson.Key as A
 import qualified Data.Aeson.KeyMap as A
 import Data.Binary.Instances.UnorderedContainers ()
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HMap
+import qualified Data.Vector as V
 import Development.Shake
 import Development.Shake.Classes
 import Development.Shake.FilePath
@@ -37,8 +40,9 @@ type instance RuleResult GetFDroidVersion = Maybe PackageVersion
 instance A.FromJSON FDroidIndex where
   parseJSON = A.withObject "FDroidIndex" $ \o -> do
     packages <- o A..: "packages"
-    FDroidIndex <$> A.withObject "packages" (fmap HMap.fromList . mapM (parsePackage . snd) . A.toList) packages
+    FDroidIndex <$> A.withObject "packages" (fmap HMap.fromList . mapM (\(k, v) -> (A.toText k,) <$> parsePackageArray v) . A.toList) packages
     where
+      parsePackageArray = A.withArray "packageArray" $ \a -> parsePackage (V.head a)
       parsePackage = A.withObject "package" $ \o -> do
         versionName <- o A..: "versionName"
         versionCode <- o A..: "versionCode"
@@ -47,7 +51,7 @@ instance A.FromJSON FDroidIndex where
 fdroidVersionRule :: Rules ()
 fdroidVersionRule = void $ do
   f <- addOracle $ \GetFDroidIndex -> do
-    downloadFile (buildDir </> "fdroid.json") "https://f5a.torus.icu/fdroid/repo/index-v1.json"
+    downloadFile "https://f5a.torus.icu/fdroid/repo/index-v1.json" (buildDir </> "fdroid.json")
     putInfo "Downloading FDroid index"
     liftIO (A.eitherDecodeFileStrict @FDroidIndex (buildDir </> "fdroid.json"))
       >>= \case
@@ -57,5 +61,5 @@ fdroidVersionRule = void $ do
     FDroidIndex index <- f GetFDroidIndex
     pure $ HMap.lookup packageName index
 
-getLatestFDroidVersion :: PackageName -> Action (Maybe (VersionName, VersionCode))
+getLatestFDroidVersion :: PackageName -> Action (Maybe PackageVersion)
 getLatestFDroidVersion = askOracle . GetFDroidVersion

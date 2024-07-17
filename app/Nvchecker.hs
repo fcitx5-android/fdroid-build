@@ -113,7 +113,7 @@ genNvConfig options versionSource =
     key =: x = tell [key <> " = " <> "\"" <> x <> "\""]
     key =:? (Just x) = key =: x
     _ =:? _ = pure ()
-    table m = tell ["pkg"] >> m >> tell [""]
+    table m = tell ["[pkg]"] >> m >> tell [""]
     genVersionSource = \case
       GitHubRelease {..} -> do
         "source" =: "github"

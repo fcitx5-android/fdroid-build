@@ -3,6 +3,7 @@
 
 module Main where
 
+import Config (buildDir)
 import Control.Monad (forM_)
 import Core
 import qualified Data.HashMap.Strict as HMap
@@ -19,10 +20,17 @@ main :: IO ()
 main = do
   shakeExtras <- initShakeExtras packages
   let pkgNames = descPackageName <$> packages
-  shake shakeOptions {shakeExtra = addShakeExtra shakeExtras HMap.empty} $ do
-    usingConfigFile "build.cfg"
-    forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
-    "everything" %> \_ -> need $ T.unpack <$> pkgNames
+  shake
+    shakeOptions
+      { shakeExtra = addShakeExtra shakeExtras HMap.empty,
+        shakeFiles = buildDir
+      }
+    $ do
+      usingConfigFile "build.cfg"
+      coreRule
+      forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
+      "everything" ~> need (T.unpack <$> pkgNames)
+      want ["everything"]
 
 fcitx5Path :: FilePath
 fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
@@ -32,7 +40,8 @@ packages =
   [ PackageDesc
       { descProjectName = "fcitx5-android-plugin-pinyin-moegirl",
         descPackageName = "org.fcitx.fcitx5.android.plugin.pinyin_moegirl",
-        descVersionSource = (GitHubRelease "outloudvi" "mw2fcitx", Nothing),
+        -- TODO: manual source for testing
+        descVersionSource = (Manual "20240609", Nothing), -- (GitHubRelease "outloudvi" "mw2fcitx", Nothing),
         descCreateVersionCode = read . T.unpack,
         descPreBuild = \(T.unpack -> versionName, _) projectDir ->
           downloadFile

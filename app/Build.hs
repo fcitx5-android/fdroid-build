@@ -35,7 +35,7 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
   let descConfig =
         [ ("project_name", descProjectName),
           ("package_name", descPackageName),
-          ("version_name", versionName),
+          ("build_version_name", versionName),
           ("version_code", T.pack $ show versionCode),
           ("app_name_debug", descAppNameDebug),
           ("app_name_release", descAppNameRelease),
@@ -48,13 +48,15 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
         "main_version",
         "desugarJDKLibs_version",
         "kotlin_version",
-        "plugin_api_version"
+        "plugin_api_version",
+        "android_version",
+        "build_commit_hash"
       ]
   withTempDir $ \dir -> do
     liftIO $
       T.writeFile (dir </> "build.cfg") $
-        T.unlines [T.pack (k <> " ") <> v | (k, v) <- descConfig <> libConfig]
-    cmd_ "plugin-scaffold"
+        T.unlines [T.pack (k <> " = ") <> v | (k, v) <- descConfig <> libConfig]
+    cmd_ (Cwd dir) "plugin-scaffold"
     putInfo "Running pre build"
     descPreBuild ver $ dir </> "out"
     liftIO (lookupEnv "IN_NIX_SHELL") >>= \case

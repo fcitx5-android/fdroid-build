@@ -36,6 +36,7 @@ executable fdroid-build
     , text
     , transformers
     , unordered-containers
+    , vector
 
   hs-source-dirs:   app
   default-language: Haskell2010

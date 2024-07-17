@@ -1,6 +1,6 @@
 { mkDerivation, aeson, base, base64-bytestring, binary-instances
-, bytestring, extra, http-client, http-client-tls, lib, shake, text
-, transformers, unordered-containers
+, bytestring, extra, lib, shake, text, transformers
+, unordered-containers, vector
 }:
 mkDerivation {
   pname = "fdroid-build";
@@ -10,8 +10,7 @@ mkDerivation {
   isExecutable = true;
   executableHaskellDepends = [
     aeson base base64-bytestring binary-instances bytestring extra
-    http-client http-client-tls shake text transformers
-    unordered-containers
+    shake text transformers unordered-containers vector
   ];
   license = lib.licenses.lgpl21Plus;
   mainProgram = "fdroid-build";
