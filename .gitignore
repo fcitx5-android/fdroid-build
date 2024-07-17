@@ -1,0 +1,5 @@
+build
+dist-newstyle
+report.html
+cabal.project.local
+result
