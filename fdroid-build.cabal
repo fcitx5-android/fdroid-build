@@ -17,6 +17,8 @@ executable fdroid-build
   other-modules:
     Build
     Config
+    Core
+    Download
     FDroidVersion
     Nvchecker
     ShakeExtras
@@ -30,8 +32,6 @@ executable fdroid-build
     , binary-instances
     , bytestring
     , extra
-    , http-client
-    , http-client-tls
     , shake
     , text
     , transformers

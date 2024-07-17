@@ -3,21 +3,24 @@
 
 module ShakeExtras where
 
-import Config
 import Control.Concurrent.Extra
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HMap
 import Data.Maybe (fromJust)
 import Development.Shake
-import Network.HTTP.Client (Manager)
 import Types
 
 data ShakeExtras = ShakeExtras
-  { httpManager :: Manager,
-    packageDesc :: HashMap PackageName PackageDesc,
-    packageVersion :: Var (HashMap PackageName PackageVersion),
-    config :: Config
+  { packageDesc :: HashMap PackageName PackageDesc,
+    -- version we are going to build, set in Core rule
+    packageBuildVersion :: Var (HashMap PackageName PackageVersion)
   }
+
+initShakeExtras :: [PackageDesc] -> IO ShakeExtras
+initShakeExtras pkgs = do
+  packageBuildVersion <- newVar HMap.empty
+  let packageDesc = HMap.fromList $ map (\p -> (descPackageName p, p)) pkgs
+  pure $ ShakeExtras {..}
 
 getShakeExtras :: Action ShakeExtras
 getShakeExtras = fromJust <$> getShakeExtra @ShakeExtras
@@ -27,18 +30,12 @@ lookupPackageDesc pkgName = do
   ShakeExtras {..} <- getShakeExtras
   pure $ HMap.lookup pkgName packageDesc
 
-setPackageVersion :: PackageName -> PackageVersion -> Action ()
-setPackageVersion pkgName pkgVersion = do
+setPackageBuildVersion :: PackageName -> PackageVersion -> Action ()
+setPackageBuildVersion pkgName pkgVersion = do
   ShakeExtras {..} <- getShakeExtras
-  liftIO $ modifyVar_ packageVersion $ pure . HMap.insert pkgName pkgVersion
+  liftIO $ modifyVar_ packageBuildVersion $ pure . HMap.insert pkgName pkgVersion
 
-getPackageVersion :: PackageName -> Action (Maybe PackageVersion)
-getPackageVersion pkgName = do
+lookupPackageBuildVersion :: PackageName -> Action (Maybe PackageVersion)
+lookupPackageBuildVersion pkgName = do
   ShakeExtras {..} <- getShakeExtras
-  liftIO $ HMap.lookup pkgName <$> readVar packageVersion
-
-getHttpManager :: Action Manager
-getHttpManager = httpManager <$> getShakeExtras
-
-getConfig :: Action Config
-getConfig = config <$> getShakeExtras
+  liftIO $ HMap.lookup pkgName <$> readVar packageBuildVersion

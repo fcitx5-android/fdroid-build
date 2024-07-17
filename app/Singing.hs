@@ -9,6 +9,7 @@ import Development.Shake.FilePath
 singingRule :: Rules ()
 singingRule = do
   buildDir </> "signed" </> "*.apk" %> \out -> do
+    putInfo $ "Signing to create " <> out
     let src = buildDir </> "unsigned" </> takeFileName out
     buildToolsRoot <- getEnvError "ANDROID_BUILD_TOOLS_ROOT"
     let zipalign = buildToolsRoot </> "zipalign"

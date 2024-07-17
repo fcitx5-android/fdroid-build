@@ -7,6 +7,7 @@
 
 module FDroidVersion where
 
+import Config (buildDir)
 import Control.Monad (void)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.KeyMap as A
@@ -15,9 +16,9 @@ import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HMap
 import Development.Shake
 import Development.Shake.Classes
+import Development.Shake.FilePath
+import Download (downloadFile)
 import GHC.Generics (Generic)
-import Network.HTTP.Client (httpLbs, parseRequest, responseBody)
-import ShakeExtras
 import Types
 
 newtype GetFDroidVersion = GetFDroidVersion PackageName
@@ -46,15 +47,12 @@ instance A.FromJSON FDroidIndex where
 fdroidVersionRule :: Rules ()
 fdroidVersionRule = void $ do
   f <- addOracle $ \GetFDroidIndex -> do
-    manager <- getHttpManager
-    request <- liftIO $ parseRequest "https://f5a.torus.icu/fdroid/repo/index-v1.json"
-    liftIO (httpLbs request manager)
-      >>= ( \case
-              Left err -> error err
-              Right index -> pure index
-          )
-        . A.eitherDecode @FDroidIndex
-        . responseBody
+    downloadFile (buildDir </> "fdroid.json") "https://f5a.torus.icu/fdroid/repo/index-v1.json"
+    putInfo "Downloading FDroid index"
+    liftIO (A.eitherDecodeFileStrict @FDroidIndex (buildDir </> "fdroid.json"))
+      >>= \case
+        Left err -> error err
+        Right index -> pure index
   addOracle $ \(GetFDroidVersion packageName) -> do
     FDroidIndex index <- f GetFDroidIndex
     pure $ HMap.lookup packageName index

@@ -2,7 +2,7 @@ module Types where
 
 import Data.Text (Text)
 import Development.Shake
-import Nvchecker (Version, VersionSource)
+import Nvchecker (NvcheckerOptions, Version, VersionSource)
 
 type ProjectName = Text
 
@@ -17,9 +17,9 @@ type PackageVersion = (VersionName, VersionCode)
 data PackageDesc = PackageDesc
   { descProjectName :: ProjectName,
     descPackageName :: PackageName,
-    descVersionSource :: VersionSource,
+    descVersionSource :: (VersionSource, Maybe NvcheckerOptions),
     descCreateVersionCode :: Version -> VersionCode,
-    descPreBuild :: FilePath -> Action (),
+    descPreBuild :: PackageVersion -> FilePath -> Action (),
     descAppNameDebug :: Text,
     descAppNameRelease :: Text,
     descPluginDesc :: Text

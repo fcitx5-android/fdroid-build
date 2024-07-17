@@ -23,6 +23,7 @@ import Control.Monad (void)
 import Control.Monad.Trans.Writer
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Char8 as BS
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Development.Shake
@@ -158,5 +159,5 @@ genNvConfig options versionSource =
       "from_pattern" =:? _fromPattern
       "to_pattern" =:? _toPattern
 
-checkVersion :: VersionSource -> NvcheckerOptions -> Action Version
-checkVersion v o = askOracle $ CheckVersion v o
+checkVersion :: VersionSource -> Maybe NvcheckerOptions -> Action Version
+checkVersion v o = askOracle $ CheckVersion v $ fromMaybe (NvcheckerOptions mempty mempty mempty) o
