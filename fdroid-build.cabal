@@ -3,10 +3,12 @@ name:            fdroid-build
 version:         0.1.0.0
 license:         LGPL-2.1-or-later
 license-file:    LICENSE
-author:          Potato Hatsue
-maintainer:      berberman@yabdex.com
+author:          berberman
+maintainer:      berberman@yandex.com
 build-type:      Simple
 extra-doc-files: CHANGELOG.md
+data-dir:        data
+data-files:      sign-apk.sh
 
 common warnings
   ghc-options: -Wall
@@ -21,14 +23,14 @@ executable fdroid-build
     Download
     FDroidVersion
     Nvchecker
+    Paths_fdroid_build
     ShakeExtras
-    Singing
     Types
 
+  autogen-modules:  Paths_fdroid_build
   build-depends:
     , aeson
     , base                  ^>=4.18.2.1
-    , base64-bytestring
     , binary-instances
     , bytestring
     , extra

@@ -77,11 +77,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715315072,
-        "narHash": "sha256-GUG4ouzaDLRr2kwlwODpYnM21ocwrJg3vGj2FRxm218=",
+        "lastModified": 1721305324,
+        "narHash": "sha256-1JCwZ51vmnMKYqw4ukN1w5S7i/DRH/e3q1W9gg2x0pg=",
         "owner": "fcitx5-android",
         "repo": "plugin-scaffold",
-        "rev": "d13657f02e7107a1cc255770a81246c3dbaf859e",
+        "rev": "d7d77ef0f57275081f8696964b44c6bfefcf2247",
         "type": "github"
       },
       "original": {
