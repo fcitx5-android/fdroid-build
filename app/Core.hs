@@ -46,8 +46,7 @@ coreRule = void $ do
         pure ()
       else do
         putInfo $ "New version for " <> T.unpack descPackageName <> " (" <> T.unpack upstreamVersion <> ")" <> ": " <> show fdroidVersion <> " -> " <> show (upstreamVersionName, upstreamVersionCode)
-        setPackageBuildVersion packageName (upstreamVersion, upstreamVersionName, upstreamVersionCode)
-        apk <- buildPackage packageName
+        apk <- buildPackage packageName (upstreamVersion, upstreamVersionName, upstreamVersionCode)
         let signed = buildDir </> "signed" </> apk
         need [signed]
         putInfo $ "Built " <> T.unpack packageName <> " at " <> signed

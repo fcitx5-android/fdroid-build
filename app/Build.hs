@@ -1,5 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -18,16 +18,15 @@ import ShakeExtras
 import System.Directory.Extra (copyFile, createDirectoryIfMissing, renameFile)
 import Types
 
-newtype Build = Build PackageName
+data Build = Build PackageName PackageVersion
   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData)
 
 type instance RuleResult Build = FilePath
 
 buildRule :: Rules ()
-buildRule = void $ addOracle $ \(Build packageName) -> do
-  putInfo $ "Start building" <> T.unpack packageName
+buildRule = void $ addOracle $ \(Build packageName ver@(_, versionName, versionCode)) -> do
+  putInfo $ "Start building " <> T.unpack packageName
   PackageDesc {..} <- getPackageDesc packageName
-  ver@(_, versionName, versionCode) <- getPackageBuildVersion packageName
   let descConfig =
         [ ("project_name", descProjectName),
           ("package_name", descPackageName),
@@ -71,5 +70,5 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
     pure apk
 
 -- | Returns the name of the apk file located in @buildDir@/unsigned
-buildPackage :: PackageName -> Action FilePath
-buildPackage = askOracle . Build
+buildPackage :: PackageName -> PackageVersion -> Action FilePath
+buildPackage pkgName ver = askOracle $ Build pkgName ver
