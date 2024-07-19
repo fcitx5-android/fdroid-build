@@ -39,14 +39,15 @@ coreRule = void $ do
     fdroidVersion <- getLatestFDroidVersion packageName
     putInfo $ "Checking upstream version for " <> T.unpack descPackageName
     upstreamVersion <- checkVersion descVersionSource
+    upstreamVersionName <- descCreateVersionName upstreamVersion
     upstreamVersionCode <- descCreateVersionCode upstreamVersion
-    if fdroidVersion == Just (upstreamVersion, upstreamVersionCode)
+    if fdroidVersion == Just (upstreamVersionName, upstreamVersionCode)
       then do
         putInfo $ "No new version for " <> T.unpack descPackageName
         pure ()
       else do
-        putInfo $ "New version for " <> T.unpack descPackageName <> ": " <> show fdroidVersion <> " -> " <> show (upstreamVersion, upstreamVersionCode)
-        setPackageBuildVersion packageName (upstreamVersion, upstreamVersionCode)
+        putInfo $ "New version for " <> T.unpack descPackageName <> " (" <> T.unpack upstreamVersion <> ")" <> ": " <> show fdroidVersion <> " -> " <> show (upstreamVersionName, upstreamVersionCode)
+        setPackageBuildVersion packageName (upstreamVersion, upstreamVersionName, upstreamVersionCode)
         apk <- buildPackage packageName
         let signed = buildDir </> "signed" </> apk
         need [signed]

@@ -29,7 +29,7 @@ buildRule :: Rules ()
 buildRule = void $ addOracle $ \(Build packageName) -> do
   putInfo $ "Start building" <> T.unpack packageName
   PackageDesc {..} <- fromJust <$> lookupPackageDesc packageName
-  (versionName, versionCode) <- fromJust <$> lookupPackageBuildVersion packageName
+  ver@(_ ,versionName, versionCode) <- fromJust <$> lookupPackageBuildVersion packageName
   let descConfig =
         [ ("project_name", descProjectName),
           ("package_name", descPackageName),
@@ -57,7 +57,7 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
     cmd_ (Cwd dir) "plugin-scaffold"
     let root = dir </> "out"
     putInfo $ "Running pre build in " <> root
-    descPreBuild versionName root
+    descPreBuild ver root
     cmd_ (Cwd root) "chmod" "+x" "gradlew"
     cmd_ (Cwd root) "./gradlew" "assembleRelease"
     let releaseDir = root </> "app" </> "build" </> "outputs" </> "apk" </> "release"

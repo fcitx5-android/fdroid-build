@@ -14,7 +14,7 @@ type VersionCode = Integer
 
 type VersionName = Text
 
-type PackageVersion = (VersionName, VersionCode)
+type PackageVersion = (Version, VersionName, VersionCode)
 
 data PackageDesc = forall nv.
   (ToNvcheckerInput nv) =>
@@ -22,8 +22,9 @@ data PackageDesc = forall nv.
   { descProjectName :: ProjectName,
     descPackageName :: PackageName,
     descVersionSource :: nv,
+    descCreateVersionName :: Version -> Action VersionName,
     descCreateVersionCode :: Version -> Action VersionCode,
-    descPreBuild :: VersionName -> FilePath -> Action (),
+    descPreBuild :: PackageVersion -> FilePath -> Action (),
     descAppNameDebug :: Text,
     descAppNameRelease :: Text,
     descPluginDesc :: Text

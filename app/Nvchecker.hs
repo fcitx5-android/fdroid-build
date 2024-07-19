@@ -67,6 +67,7 @@ data VersionSource
   | Manual {_manual :: Text}
   | Repology {_repology :: Text, _repo :: Text}
   | Webpage {_vurl :: Text, _regex :: Text, _listOptions :: ListOptions}
+  | Cmd {_vcmd :: Text}
   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData)
 
 data CheckVersion = CheckVersion VersionSource NvcheckerOptions
@@ -151,6 +152,9 @@ genNvConfig options versionSource =
         "url" =: _vurl
         "regex" =: _regex
         genListOptions _listOptions
+      Cmd {..} -> do
+        "source" =: "cmd"
+        "cmd" =: _vcmd
     genListOptions ListOptions {..} = do
       "include_regex" =:? _includeRegex
       "exclude_regex" =:? _excludeRegex

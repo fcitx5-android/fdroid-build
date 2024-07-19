@@ -6,6 +6,7 @@ import Config (buildDir)
 import Control.Monad (forM_)
 import Core
 import qualified Data.HashMap.Strict as HMap
+import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Development.Shake
@@ -21,7 +22,7 @@ main :: IO ()
 main = do
   shakeExtras <- initShakeExtras packages
   let pkgNames = descPackageName <$> packages
-  shake
+  shakeArgs
     shakeOptions
       { shakeExtra = addShakeExtra shakeExtras HMap.empty,
         shakeFiles = buildDir
@@ -39,8 +40,8 @@ fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
 mkPackageName :: Text -> PackageName
 mkPackageName name = "org.fcitx.fcitx5.android.plugin." <> name
 
-versionNameToVersionCode :: VersionName -> Action VersionCode
-versionNameToVersionCode = pure . read . T.unpack
+readInteger :: Text -> Action Integer
+readInteger = pure . read . T.unpack
 
 mkProjectName :: Text -> ProjectName
 mkProjectName name = "fcitx5-android-plugin-" <> name
@@ -62,13 +63,13 @@ packages =
   [ PackageDesc
       { descProjectName = mkProjectName "pinyin-moegirl",
         descPackageName = mkPackageName "pinyin_moegirl",
-        -- TODO: manual source for testing
-        descVersionSource = Manual "20240609", -- (GitHubRelease "outloudvi" "mw2fcitx"),
-        descCreateVersionCode = versionNameToVersionCode,
-        descPreBuild = \versionName projectDir ->
+        descVersionSource = GitHubRelease "outloudvi" "mw2fcitx",
+        descCreateVersionName = pure,
+        descCreateVersionCode = readInteger,
+        descPreBuild = \(_, dictVer, _) projectDir ->
           downloadFile
-            (githubReleaseFileUrl "outloudvi" "mw2fcitx" versionName "moegirl.dict")
-            (pinyinDictPath projectDir </> T.unpack versionName <.> "dict"),
+            (githubReleaseFileUrl "outloudvi" "mw2fcitx" dictVer "moegirl.dict")
+            (pinyinDictPath projectDir </> T.unpack dictVer <.> "dict"),
         descAppNameDebug = "Fcitx5 for Android (moegirl dict | Debug)",
         descAppNameRelease = "Fcitx5 for Android (moegirl dict)",
         descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.moegirl.org.cn"
@@ -77,13 +78,32 @@ packages =
       { descProjectName = mkProjectName "pinyin-minecraft",
         descPackageName = mkPackageName "pinyin_minecraft",
         descVersionSource = GitHubRelease "oldherl" "fcitx5-pinyin-minecraft",
+        descCreateVersionName = pure,
         descCreateVersionCode = getGitHubCommitTime "oldherl" "fcitx5-pinyin-minecraft",
-        descPreBuild = \versionName projectDir ->
+        descPreBuild = \(_, dictVer, _) projectDir ->
           downloadFile
-            (githubReleaseFileUrl "oldherl" "fcitx5-pinyin-minecraft" versionName "minecraft-cn.dict")
-            (pinyinDictPath projectDir </> "minecraft-" <> T.unpack versionName <.> "dict"),
+            (githubReleaseFileUrl "oldherl" "fcitx5-pinyin-minecraft" dictVer "minecraft-cn.dict")
+            (pinyinDictPath projectDir </> "minecraft-" <> T.unpack dictVer <.> "dict"),
         descAppNameDebug = "Fcitx5 for Android (minecraft dict | Debug)",
         descAppNameRelease = "Fcitx5 for Android (minecraft dict)",
         descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.minecraft.org.cn"
+      },
+    PackageDesc
+      { descProjectName = mkProjectName "pinyin-zhwiki",
+        descPackageName = mkPackageName "pinyin_zhwiki",
+        descVersionSource = ArchLinux "fcitx5-pinyin-zhwiki",
+        -- drop converter version
+        descCreateVersionName = pure . T.takeWhileEnd (/= '.'),
+        -- same as version name, but in integer
+        descCreateVersionCode = readInteger . T.takeWhileEnd (/= '.'),
+        descPreBuild = \(version, dictVer, _) projectDir ->
+          let converterVer = fromJust $ T.stripSuffix ("." <> dictVer) version
+              dictName = "zhwiki-" <> T.unpack dictVer <.> "dict"
+           in downloadFile
+                (githubReleaseFileUrl "felixonmars" "fcitx5-pinyin-zhwiki" converterVer dictName)
+                (pinyinDictPath projectDir </> dictName),
+        descAppNameDebug = "Fcitx5 for Android (zhwiki dict | Debug)",
+        descAppNameRelease = "Fcitx5 for Android (zhwiki dict)",
+        descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.wikipedia.org"
       }
   ]

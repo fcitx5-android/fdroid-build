@@ -30,12 +30,14 @@ newtype GetFDroidVersion = GetFDroidVersion PackageName
 data GetFDroidIndex = GetFDroidIndex
   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData)
 
-newtype FDroidIndex = FDroidIndex (HashMap PackageName PackageVersion)
+newtype FDroidIndex = FDroidIndex (HashMap PackageName FDroidVersion)
   deriving (Show, Typeable, Eq, Ord, Generic, Hashable, Binary, NFData)
+
+type FDroidVersion = (VersionName, VersionCode)
 
 type instance RuleResult GetFDroidIndex = FDroidIndex
 
-type instance RuleResult GetFDroidVersion = Maybe PackageVersion
+type instance RuleResult GetFDroidVersion = Maybe FDroidVersion
 
 instance A.FromJSON FDroidIndex where
   parseJSON = A.withObject "FDroidIndex" $ \o -> do
@@ -61,5 +63,5 @@ fdroidVersionRule = void $ do
     FDroidIndex index <- f GetFDroidIndex
     pure $ HMap.lookup packageName index
 
-getLatestFDroidVersion :: PackageName -> Action (Maybe PackageVersion)
+getLatestFDroidVersion :: PackageName -> Action (Maybe FDroidVersion)
 getLatestFDroidVersion = askOracle . GetFDroidVersion
