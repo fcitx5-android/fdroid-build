@@ -23,6 +23,7 @@ executable fdroid-build
     Nvchecker
     ShakeExtras
     Sign
+    GitCommitTime
     Types
 
   build-depends:

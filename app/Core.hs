@@ -15,6 +15,7 @@ import Development.Shake.Classes
 import Development.Shake.FilePath
 import FDroidVersion
 import GHC.Generics (Generic)
+import GitCommitTime
 import Nvchecker
 import ShakeExtras
 import Sign
@@ -31,13 +32,14 @@ coreRule = void $ do
   fdroidVersionRule
   buildRule
   singRule
+  gitCommitTimeRule
   addOracle $ \(Core packageName) -> do
     PackageDesc {..} <- fromJust <$> lookupPackageDesc packageName
     putInfo $ "Checking f-droid version for " <> T.unpack descPackageName
     fdroidVersion <- getLatestFDroidVersion packageName
     putInfo $ "Checking upstream version for " <> T.unpack descPackageName
-    upstreamVersion <- uncurry checkVersion $ descVersionSource
-    let upstreamVersionCode = descCreateVersionCode upstreamVersion
+    upstreamVersion <- checkVersion descVersionSource
+    upstreamVersionCode <- descCreateVersionCode upstreamVersion
     if fdroidVersion == Just (upstreamVersion, upstreamVersionCode)
       then do
         putInfo $ "No new version for " <> T.unpack descPackageName

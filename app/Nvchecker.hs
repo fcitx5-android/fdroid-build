@@ -1,9 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 
 -- | Adapted from https://github.com/berberman/nvfetcher/blob/master/src/NvFetcher/Nvchecker.hs
@@ -16,6 +18,7 @@ module Nvchecker
     VersionSource (..),
     nvcheckerRule,
     checkVersion,
+    ToNvcheckerInput (..),
   )
 where
 
@@ -23,7 +26,6 @@ import Control.Monad (void)
 import Control.Monad.Trans.Writer
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Char8 as BS
-import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Development.Shake
@@ -159,5 +161,14 @@ genNvConfig options versionSource =
       "from_pattern" =:? _fromPattern
       "to_pattern" =:? _toPattern
 
-checkVersion :: VersionSource -> Maybe NvcheckerOptions -> Action Version
-checkVersion v o = askOracle $ CheckVersion v $ fromMaybe (NvcheckerOptions mempty mempty mempty) o
+class ToNvcheckerInput a where
+  toNvcheckerInput :: a -> (VersionSource, NvcheckerOptions)
+
+instance ToNvcheckerInput VersionSource where
+  toNvcheckerInput = (,NvcheckerOptions mempty mempty mempty)
+
+instance ToNvcheckerInput (VersionSource, NvcheckerOptions) where
+  toNvcheckerInput (v, n) = (v, n)
+
+checkVersion :: (ToNvcheckerInput a) => a -> Action Version
+checkVersion x = askOracle $ uncurry CheckVersion $ toNvcheckerInput x
