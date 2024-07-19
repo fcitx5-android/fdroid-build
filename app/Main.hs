@@ -35,14 +35,10 @@ main = do
       -- phony rules for each package
       forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
 
-      "everything" ~> do
-        need (T.unpack <$> pkgNames)
-        need ["deploy"]
+      "build" ~> need (T.unpack <$> pkgNames)
 
       "deploy" ~> do
-        -- run after package's phony rules
-        -- but don't depend on them
-        orderOnly $ T.unpack <$> pkgNames
+        need ["build"]
         packagesBuilt <- getPackagesBuilt
         if HMap.null packagesBuilt
           then putInfo "No packages to deploy"
@@ -50,6 +46,12 @@ main = do
             rsync
             updateRepo
             putInfo "Deployed"
+
+      "update-repo" ~> updateRepo
+
+      "clean" ~> do
+        removeFilesAfter buildDir ["//*"]
+        putInfo "Cleaned"
 
 fcitx5Path :: FilePath
 fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
