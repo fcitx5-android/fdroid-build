@@ -6,7 +6,6 @@ import Config (buildDir)
 import Control.Monad (forM_)
 import Core
 import qualified Data.HashMap.Strict as HMap
-import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Deploy
@@ -116,7 +115,9 @@ packages =
         -- same as version name, but in integer
         descCreateVersionCode = readInteger . T.takeWhileEnd (/= '.'),
         descPreBuild = \(version, dictVer, _) projectDir ->
-          let converterVer = fromJust $ T.stripSuffix ("." <> dictVer) version
+          let converterVer = case T.stripSuffix ("." <> dictVer) version of
+                Just v -> v
+                Nothing -> error $ "Invalid version " <> T.unpack version
               dictName = "zhwiki-" <> T.unpack dictVer <.> "dict"
            in downloadFile
                 (githubReleaseFileUrl "felixonmars" "fcitx5-pinyin-zhwiki" converterVer dictName)

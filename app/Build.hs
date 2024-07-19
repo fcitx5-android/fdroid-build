@@ -1,14 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Build where
 
 import Config
 import Control.Monad (void)
-import Data.Maybe (fromJust)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Development.Shake
@@ -28,8 +26,8 @@ type instance RuleResult Build = FilePath
 buildRule :: Rules ()
 buildRule = void $ addOracle $ \(Build packageName) -> do
   putInfo $ "Start building" <> T.unpack packageName
-  PackageDesc {..} <- fromJust <$> lookupPackageDesc packageName
-  ver@(_ ,versionName, versionCode) <- fromJust <$> lookupPackageBuildVersion packageName
+  PackageDesc {..} <- getPackageDesc packageName
+  ver@(_, versionName, versionCode) <- getPackageBuildVersion packageName
   let descConfig =
         [ ("project_name", descProjectName),
           ("package_name", descPackageName),
@@ -40,16 +38,18 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
           ("plugin_description", descPluginDesc)
         ]
   libConfig <-
-    mapM
-      (\k -> (k,) . T.pack . fromJust <$> getConfig k)
-      [ "aboutlibraries_version",
-        "main_version",
-        "desugarJDKLibs_version",
-        "kotlin_version",
-        "plugin_api_version",
-        "android_version",
-        "build_commit_hash"
-      ]
+    let f k (Just s) = (k, T.pack s)
+        f k Nothing = error $ "Config " <> k <> " not found"
+     in mapM
+          (\k -> f k <$> getConfig k)
+          [ "aboutlibraries_version",
+            "main_version",
+            "desugarJDKLibs_version",
+            "kotlin_version",
+            "plugin_api_version",
+            "android_version",
+            "build_commit_hash"
+          ]
   withTempDir $ \dir -> do
     liftIO $
       T.writeFile (dir </> "build.cfg") $

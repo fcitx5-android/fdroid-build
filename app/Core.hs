@@ -8,7 +8,6 @@ module Core where
 import Build
 import Config
 import Control.Monad (void)
-import Data.Maybe (fromJust)
 import qualified Data.Text as T
 import Development.Shake
 import Development.Shake.Classes
@@ -34,7 +33,7 @@ coreRule = void $ do
   singRule
   gitCommitTimeRule
   addOracle $ \(Core packageName) -> do
-    PackageDesc {..} <- fromJust <$> lookupPackageDesc packageName
+    PackageDesc {..} <- getPackageDesc packageName
     putInfo $ "Checking f-droid version for " <> T.unpack descPackageName
     fdroidVersion <- getLatestFDroidVersion packageName
     putInfo $ "Checking upstream version for " <> T.unpack descPackageName
