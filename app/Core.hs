@@ -10,7 +10,6 @@ import Config
 import Control.Monad (void)
 import Data.Maybe (fromJust)
 import qualified Data.Text as T
-import Deploy
 import Development.Shake
 import Development.Shake.Classes
 import Development.Shake.FilePath
@@ -34,7 +33,6 @@ coreRule = void $ do
   buildRule
   singRule
   gitCommitTimeRule
-  deployRule
   addOracle $ \(Core packageName) -> do
     PackageDesc {..} <- fromJust <$> lookupPackageDesc packageName
     putInfo $ "Checking f-droid version for " <> T.unpack descPackageName

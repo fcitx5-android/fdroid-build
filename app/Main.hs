@@ -9,6 +9,7 @@ import qualified Data.HashMap.Strict as HMap
 import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text as T
+import Deploy
 import Development.Shake
 import Development.Shake.Config (usingConfigFile)
 import Development.Shake.FilePath
@@ -30,10 +31,25 @@ main = do
     $ do
       usingConfigFile "build.cfg"
       coreRule
+
+      -- phony rules for each package
       forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
+
       "everything" ~> do
         need (T.unpack <$> pkgNames)
         need ["deploy"]
+
+      "deploy" ~> do
+        -- run after package's phony rules
+        -- but don't depend on them
+        orderOnly $ T.unpack <$> pkgNames
+        packagesBuilt <- getPackagesBuilt
+        if HMap.null packagesBuilt
+          then putInfo "No packages to deploy"
+          else do
+            rsync
+            updateRepo
+            putInfo "Deployed"
 
 fcitx5Path :: FilePath
 fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
