@@ -13,12 +13,14 @@ import Types
 data ShakeExtras = ShakeExtras
   { packageDesc :: HashMap PackageName PackageDesc,
     -- version we are going to build, set in Core rule
-    packageBuildVersion :: Var (HashMap PackageName PackageVersion)
+    packageBuildVersion :: Var (HashMap PackageName PackageVersion),
+    packageBuilt :: Var (HashMap PackageName FilePath)
   }
 
 initShakeExtras :: [PackageDesc] -> IO ShakeExtras
 initShakeExtras pkgs = do
   packageBuildVersion <- newVar HMap.empty
+  packageBuilt <- newVar HMap.empty
   let packageDesc = HMap.fromList $ map (\p -> (descPackageName p, p)) pkgs
   pure $ ShakeExtras {..}
 
@@ -39,3 +41,13 @@ lookupPackageBuildVersion :: PackageName -> Action (Maybe PackageVersion)
 lookupPackageBuildVersion pkgName = do
   ShakeExtras {..} <- getShakeExtras
   liftIO $ HMap.lookup pkgName <$> readVar packageBuildVersion
+
+markPackageBuilt :: PackageName -> FilePath -> Action ()
+markPackageBuilt pkgName path = do
+  ShakeExtras {..} <- getShakeExtras
+  liftIO $ modifyVar_ packageBuilt $ pure . HMap.insert pkgName path
+
+getPackagesBuilt :: Action (HashMap PackageName FilePath)
+getPackagesBuilt = do
+  ShakeExtras {..} <- getShakeExtras
+  liftIO $ readVar packageBuilt

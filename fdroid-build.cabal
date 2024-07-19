@@ -18,12 +18,13 @@ executable fdroid-build
     Build
     Config
     Core
+    Deploy
     Download
     FDroidVersion
+    GitCommitTime
     Nvchecker
     ShakeExtras
     Sign
-    GitCommitTime
     Types
 
   build-depends:

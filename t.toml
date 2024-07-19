@@ -1,5 +1,0 @@
-
-[test]
-source = "github"
-github = "oldherl/fcitx5-pinyin-minecraft"
-use_latest_release = true

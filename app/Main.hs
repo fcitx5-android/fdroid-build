@@ -31,8 +31,9 @@ main = do
       usingConfigFile "build.cfg"
       coreRule
       forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
-      "everything" ~> need (T.unpack <$> pkgNames)
-      want ["everything"]
+      "everything" ~> do
+        need (T.unpack <$> pkgNames)
+        need ["deploy"]
 
 fcitx5Path :: FilePath
 fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
