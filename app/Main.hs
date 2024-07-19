@@ -34,7 +34,14 @@ main = do
       -- phony rules for each package
       forM_ pkgNames $ \pkgName -> phony (T.unpack pkgName) (runCore pkgName)
 
-      "build" ~> need (T.unpack <$> pkgNames)
+      "build" ~> do
+        need (T.unpack <$> pkgNames)
+        changelog <- T.unpack <$> generateChangelog
+        if null changelog
+          then putInfo "No changelog"
+          else do
+            putInfo changelog
+            writeFile' (buildDir </> "changelog.txt") changelog
 
       "deploy" ~> do
         need ["build"]
@@ -51,6 +58,24 @@ main = do
       "clean" ~> do
         removeFilesAfter buildDir ["//*"]
         putInfo "Cleaned"
+
+generateChangelog :: Action Text
+generateChangelog =
+  HMap.foldlWithKey'
+    ( \acc pkgName (fdroidVersion, (_, newVersionName, _)) ->
+        acc
+          <> pkgName
+          <> ": "
+          <> ( case fdroidVersion of
+                 Just (oldVersionName, _) -> oldVersionName
+                 Nothing -> "∅"
+             )
+          <> " → "
+          <> newVersionName
+          <> "\n"
+    )
+    ""
+    <$> getAllChangeLogs
 
 fcitx5Path :: FilePath
 fcitx5Path = "app/src/main/assets/usr/share/fcitx5"
