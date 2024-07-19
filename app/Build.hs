@@ -1,16 +1,14 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE ViewPatterns #-}
 
 module Build where
 
 import Config
 import Control.Monad (void)
-import Data.Maybe (fromJust, isJust)
+import Data.Maybe (fromJust)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Development.Shake
@@ -18,10 +16,8 @@ import Development.Shake.Classes
 import Development.Shake.Config
 import Development.Shake.FilePath
 import GHC.Generics (Generic)
-import Paths_fdroid_build (getDataFileName)
 import ShakeExtras
-import System.Directory.Extra (copyFile)
-import System.Environment (lookupEnv)
+import System.Directory.Extra (copyFile, createDirectoryIfMissing, renameFile)
 import Types
 
 newtype Build = Build PackageName
@@ -63,26 +59,16 @@ buildRule = void $ addOracle $ \(Build packageName) -> do
     putInfo $ "Running pre build in " <> root
     descPreBuild ver root
     cmd_ (Cwd root) "chmod" "+x" "gradlew"
-    -- Run command in nix shell if we are in nix shell
-    isInNixShell <- liftIO $ isJust <$> lookupEnv "IN_NIX_SHELL"
-    if isInNixShell
-      then do
-        -- Git repo is required for nix flake
-        cmd_ (Cwd root) "git init"
-        cmd_ (Cwd root) "git add ."
-        cmd_ (Cwd root) "nix" "develop" ".#noAS" "--command" "./gradlew" "assembleRelease"
-      else cmd_ (Cwd root) "./gradlew" "assembleRelease"
+    cmd_ (Cwd root) "./gradlew" "assembleRelease"
     let releaseDir = root </> "app" </> "build" </> "outputs" </> "apk" </> "release"
-    unsignedApk <- liftIO $ head <$> getDirectoryFilesIO releaseDir ["*.apk"]
-    putInfo $ "Singing " <> unsignedApk
-    signer <- liftIO $ getDataFileName "sign-apk.sh"
-    (Stdout (takeFileName -> signedApk)) <-
-      if isInNixShell
-        then cmd (Cwd root) "nix" "develop" ".#noAS" "--command" signer (releaseDir </> unsignedApk)
-        else cmd (Cwd root) signer (releaseDir </> unsignedApk)
-    putInfo $ "Copying " <> signedApk <> " to build directory"
-    liftIO $ copyFile (releaseDir </> signedApk) (buildDir </> signedApk)
-    pure signedApk
+    let unsignedApk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <> "-" <> "unsigned" <.> "apk"
+        apk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <.> "apk"
+    putInfo $ "Renaming " <> unsignedApk <> " to " <> apk
+    liftIO $ renameFile (releaseDir </> unsignedApk) (releaseDir </> apk)
+    putInfo $ "Copying " <> apk <> " to build directory"
+    liftIO $ createDirectoryIfMissing True (buildDir </> "unsigned")
+    liftIO $ copyFile (releaseDir </> apk) (buildDir </> "unsigned" </> apk)
+    pure apk
 
 -- | Returns the name of the apk file located in @buildDir@/unsigned
 buildPackage :: PackageName -> Action FilePath

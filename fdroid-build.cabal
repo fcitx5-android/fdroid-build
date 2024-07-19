@@ -7,8 +7,6 @@ author:          berberman
 maintainer:      berberman@yandex.com
 build-type:      Simple
 extra-doc-files: CHANGELOG.md
-data-dir:        data
-data-files:      sign-apk.sh
 
 common warnings
   ghc-options: -Wall
@@ -23,14 +21,14 @@ executable fdroid-build
     Download
     FDroidVersion
     Nvchecker
-    Paths_fdroid_build
     ShakeExtras
+    Sign
     Types
 
-  autogen-modules:  Paths_fdroid_build
   build-depends:
     , aeson
-    , base                  ^>=4.18.2.1
+    , base
+    , base64-bytestring
     , binary-instances
     , bytestring
     , extra
