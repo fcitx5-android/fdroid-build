@@ -14,9 +14,9 @@ singRule = do
     let src = buildDir </> "unsigned" </> takeFileName out
     putInfo $ "Signing " <> src
     need [src]
-    androidSDKRoot <- getEnvError "ANDROID_SDK_ROOT"
+    androidHome <- getEnvError "ANDROID_HOME"
     buildToolsVersion <- getEnvError "BUILD_TOOLS_VERSION"
-    let buildToolsRoot = androidSDKRoot </> "build-tools" </> buildToolsVersion
+    let buildToolsRoot = androidHome </> "build-tools" </> buildToolsVersion
     let zipalign = buildToolsRoot </> "zipalign"
         apksigner = buildToolsRoot </> "apksigner"
     withTempDir $ \dir -> do
