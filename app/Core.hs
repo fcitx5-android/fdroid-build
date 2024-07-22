@@ -40,18 +40,19 @@ coreRule = void $ do
     upstreamVersion <- checkVersion descVersionSource
     upstreamVersionName <- descCreateVersionName upstreamVersion
     upstreamVersionCode <- descCreateVersionCode upstreamVersion
+    let ver = (upstreamVersion, upstreamVersionName, upstreamVersionCode)
     if fdroidVersion == Just (upstreamVersionName, upstreamVersionCode)
       then do
         putInfo $ "No new version for " <> T.unpack descPackageName
         pure ()
       else do
         putInfo $ "New version for " <> T.unpack descPackageName <> " (" <> T.unpack upstreamVersion <> ")" <> ": " <> show fdroidVersion <> " -> " <> show (upstreamVersionName, upstreamVersionCode)
-        
-        apk <- buildPackage packageName (upstreamVersion, upstreamVersionName, upstreamVersionCode)
+        apk <- buildPackage packageName ver
         let signed = buildDir </> "signed" </> apk
         need [signed]
         putInfo $ "Built " <> T.unpack packageName <> " at " <> signed
         markPackageBuilt packageName signed
+        addChangelog packageName fdroidVersion ver
 
 runCore :: PackageName -> Action ()
 runCore packageName = askOracle $ Core packageName
