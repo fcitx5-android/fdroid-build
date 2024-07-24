@@ -26,8 +26,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          CONVERTER="${{ steps.fdroid.outputs.converter }}"
           FDROID="${{ steps.fdroid.outputs.version }}"
+          CONVERTER="${{ steps.archlinux.outputs.converter }}"
           ARCHLINUX="${{ steps.archlinux.outputs.version }}"
           echo "FDROID=$FDROID; ARCHLINUX=$ARCHLINUX"
           if [ "$FDROID" != "$ARCHLINUX" ]; then
