@@ -27,5 +27,6 @@ mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
 curl -L "https://github.com/oldherl/fcitx5-pinyin-minecraft/releases/download/${MINECRAFT_TAG}/minecraft-cn.dict" \
   -o "out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/minecraft-${MINECRAFT_TAG}.dict"
 cd out
+chmod +x ./gradlew
 nix develop .#noAS --command ./gradlew assembleRelease
 mv app/build/outputs/apk/release/*.apk "org.fcitx.fcitx5.android.plugin.pinyin_minecraft-${MINECRAFT_TAG}-unsigned.apk"

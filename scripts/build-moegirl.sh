@@ -27,5 +27,6 @@ mkdir -p out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/
 curl -L "https://github.com/outloudvi/mw2fcitx/releases/download/${MOEGIRL_VER}/moegirl.dict" \
   -o "out/app/src/main/assets/usr/share/fcitx5/pinyin/dictionaries/moegirl-${MOEGIRL_VER}.dict"
 cd out
+chmod +x ./gradlew
 nix develop .#noAS --command ./gradlew assembleRelease
 mv app/build/outputs/apk/release/*.apk "org.fcitx.fcitx5.android.plugin.pinyin_moegirl-${MOEGIRL_VER}-unsigned.apk"
