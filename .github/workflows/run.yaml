@@ -1,15 +1,16 @@
-name: Build
+name: Run
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
+    inputs:
+      target:
+        description: "Target to build"
+        required: true
+        type: string
+        default: "build"
   pull_request:
-  schedule:
-    - cron: "0 0 * * *"
 jobs:
-  build:
+  run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,10 +31,26 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: nix develop --command cabal run -- fdroid-build build
+        run: nix develop --command cabal run -- fdroid-build ${{ inputs.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: plugins
           path: _build/signed/*.apk
+
+      - name: Read CHANGELOG
+        id: changelog
+        if: ${{ hashFiles('_build/changelog.txt') != ''}}
+        run: |
+          echo "::set-output name=changelog::$(cat _build/changelog.txt)"
+          echo "### Changelog\n $(cat _build/changelog.txt)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Telegram message
+        uses: appleboy/telegram-action@master
+        if: ${{ hashFiles('_build/deployed') != ''}}
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            F-Droid repo updated:\n ${{ steps.changelog.outputs.changelog }}

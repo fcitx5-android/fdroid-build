@@ -52,6 +52,7 @@ main = do
             rsync
             updateRepo
             putInfo "Deployed"
+            writeFile' (buildDir </> "deployed") ""
 
       "update-repo" ~> updateRepo
 
