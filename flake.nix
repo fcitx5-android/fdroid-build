@@ -25,7 +25,7 @@
         fdroid-builder = pkgs.haskell.lib.overrideCabal
           (pkgs.haskellPackages.callPackage ./nix { }) (drv: {
             executableSystemDepends = drv.executableSystemDepends or [ ]
-              ++ [ plugin-scaffold-exe pkgs.nvchecker ];
+              ++ [ plugin-scaffold-exe pkgs.nvchecker pkgs.unzip ];
           });
         fdroid-builder-shell = with pkgs;
           (haskell.lib.addBuildTools fdroid-builder [
