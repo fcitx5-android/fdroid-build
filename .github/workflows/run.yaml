@@ -38,12 +38,16 @@ jobs:
           name: plugins
           path: _build/signed/*.apk
 
-      - name: Read CHANGELOG
+      - name: Read changelog
         id: changelog
         if: ${{ hashFiles('_build/changelog.txt') != ''}}
         run: |
-          echo "::set-output name=changelog::$(cat _build/changelog.txt)"
-          echo "### Changelog\n $(cat _build/changelog.txt)" >> $GITHUB_STEP_SUMMARY
+          echo 'changelog<<EOF' >> $GITHUB_OUTPUT
+          cat _build/changelog.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+          echo "### Changelog :rocket:" >> $GITHUB_STEP_SUMMARY
+          cat _build/changelog.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Send Telegram message
         uses: appleboy/telegram-action@master
