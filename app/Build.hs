@@ -58,8 +58,7 @@ buildRule = void $ addOracle $ \(Build packageName ver@(_, versionName, versionC
     putInfo $ "Running pre build in " <> root
     descPreBuild ver root
     cmd_ (Cwd root) "chmod" "+x" "gradlew"
-    -- FIXME remove verbose
-    cmd_ (Cwd root) "./gradlew" "assembleRelease" "-d"
+    cmd_ (Cwd root) "./gradlew" "assembleRelease"
     let releaseDir = root </> "app" </> "build" </> "outputs" </> "apk" </> "release"
     let unsignedApk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <> "-" <> "unsigned" <.> "apk"
         apk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <.> "apk"
