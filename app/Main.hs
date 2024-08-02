@@ -111,7 +111,7 @@ getGitHubCommitTime :: Text -> Text -> Version -> Action Integer
 getGitHubCommitTime user repo = getGitCommitTime (githubUrl user repo)
 
 packages :: [PackageDesc]
-packages = [moegirl, minecraft, zhwiki, wubi98, zhengma]
+packages = [moegirl, minecraft, zhwiki, wubi98, zhengma, cangjie]
   where
     moegirl =
       PackageDesc
@@ -185,3 +185,4 @@ packages = [moegirl, minecraft, zhwiki, wubi98, zhengma]
         }
     wubi98 = mkTablePkg "wubi98" ["wubi98-pinyin", "wubi98-single", "wubi98", "wubi98-large"]
     zhengma = mkTablePkg "zhengma" ["zhengma", "zhengma-large", "zhengma-pinyin"]
+    cangjie = mkTablePkg "cangjie" ["cangjie5", "cangjie3", "cangjie-large", "scj6"]
