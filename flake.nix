@@ -24,8 +24,14 @@
         plugin-scaffold-exe = plugin-scaffold.packages.${system}.default;
         fdroid-builder = pkgs.haskell.lib.overrideCabal
           (pkgs.haskellPackages.callPackage ./nix { }) (drv: {
-            executableSystemDepends = drv.executableSystemDepends or [ ]
-              ++ [ plugin-scaffold-exe pkgs.nvchecker pkgs.unzip ];
+            buildTools = drv.buildTools or [ ] ++ [ pkgs.makeWrapper ];
+            postInstall = with pkgs;
+              drv.postInstall or "" + ''
+                wrapProgram $out/bin/fdroid-build \
+                  --prefix PATH ":" "${
+                    lib.makeBinPath [ plugin-scaffold-exe nvchecker unzip ]
+                  }"
+              '';
           });
         fdroid-builder-shell = with pkgs;
           (haskell.lib.addBuildTools fdroid-builder [
@@ -38,7 +44,8 @@
           androidStudio = null;
           generateLocalProperties = false;
         }).overrideAttrs (old: {
-          buildInputs = old.buildInputs ++ [ plugin-scaffold-exe nvchecker ]
+          buildInputs = old.buildInputs
+            ++ [ plugin-scaffold-exe nvchecker unzip ]
             ++ fdroid-builder-shell.buildInputs;
           nativeBuildInputs = old.nativeBuildInputs
             ++ fdroid-builder-shell.nativeBuildInputs;

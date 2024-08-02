@@ -5,7 +5,7 @@
 mkDerivation {
   pname = "fdroid-build";
   version = "0.1.0.0";
-  src = ./.;
+  src = ../.;
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [

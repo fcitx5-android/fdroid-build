@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v23
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v14
+        with:
+          name: fcitx5-android
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Run fdroid-build
+        env:
+          SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
+          SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
+          SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: nix shell --command fdroid-build build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: _build.signed/*.apk
