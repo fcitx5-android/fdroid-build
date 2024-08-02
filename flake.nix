@@ -29,7 +29,12 @@
               drv.postInstall or "" + ''
                 wrapProgram $out/bin/fdroid-build \
                   --prefix PATH ":" "${
-                    lib.makeBinPath [ plugin-scaffold-exe nvchecker unzip ]
+                    lib.makeBinPath [
+                      plugin-scaffold-exe
+                      nvchecker
+                      unzip
+                      rsync
+                    ]
                   }"
               '';
           });
@@ -49,7 +54,7 @@
             generateLocalProperties = false;
           }).overrideAttrs (old: {
             buildInputs = old.buildInputs
-              ++ [ plugin-scaffold-exe nvchecker unzip ]
+              ++ [ plugin-scaffold-exe nvchecker unzip rsync ]
               ++ fdroid-builder-shell.buildInputs;
             nativeBuildInputs = old.nativeBuildInputs
               ++ fdroid-builder-shell.nativeBuildInputs;
