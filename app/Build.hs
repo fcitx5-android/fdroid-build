@@ -31,7 +31,7 @@ buildRule = void $ addOracle $ \(Build packageName ver@(_, versionName, versionC
         [ ("project_name", descProjectName),
           ("package_name", descPackageName),
           ("build_version_name", versionName),
-          ("version_code", T.pack $ show versionCode),
+          ("version_code", showVersionCode versionCode),
           ("app_name_debug", descAppNameDebug),
           ("app_name_release", descAppNameRelease),
           ("plugin_description", descPluginDesc)

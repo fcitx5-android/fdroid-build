@@ -3,6 +3,7 @@
 module Types where
 
 import Data.Text (Text)
+import qualified Data.Text as T
 import Development.Shake
 import Nvchecker
 
@@ -29,3 +30,6 @@ data PackageDesc = forall nv.
     descAppNameRelease :: Text,
     descPluginDesc :: Text
   }
+
+showVersionCode :: VersionCode -> Text
+showVersionCode = T.pack . show

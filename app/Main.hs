@@ -62,16 +62,19 @@ main = do
 generateChangelog :: Action Text
 generateChangelog =
   HMap.foldlWithKey'
-    ( \acc pkgName (fdroidVersion, (_, newVersionName, _)) ->
+    ( \acc pkgName (fdroidVersion, (_, newVersionName, newVersionCode)) ->
         acc
           <> pkgName
           <> ": "
           <> ( case fdroidVersion of
-                 Just (oldVersionName, _) -> oldVersionName
+                 Just (oldVersionName, oldVersionCode) -> oldVersionName <> " (" <> showVersionCode oldVersionCode <> ")"
                  Nothing -> "∅"
              )
           <> " → "
           <> newVersionName
+          <> " ("
+          <> showVersionCode newVersionCode
+          <> ")"
           <> "\n"
     )
     ""

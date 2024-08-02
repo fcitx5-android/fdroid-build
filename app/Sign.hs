@@ -7,8 +7,8 @@ import Development.Shake
 import Development.Shake.FilePath
 import System.Directory.Extra (createDirectoryIfMissing)
 
-singRule :: Rules ()
-singRule = do
+signRule :: Rules ()
+signRule = do
   buildDir </> "signed" </> "*.apk" %> \out -> do
     liftIO $ createDirectoryIfMissing True (buildDir </> "signed")
     let src = buildDir </> "unsigned" </> takeFileName out

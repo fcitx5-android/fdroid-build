@@ -30,7 +30,7 @@ coreRule = void $ do
   nvcheckerRule
   fdroidVersionRule
   buildRule
-  singRule
+  signRule
   gitCommitTimeRule
   addOracle $ \(Core packageName) -> do
     PackageDesc {..} <- getPackageDesc packageName
