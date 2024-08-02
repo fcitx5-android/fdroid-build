@@ -33,23 +33,30 @@
                   }"
               '';
           });
-        fdroid-builder-shell = with pkgs;
-          (haskell.lib.addBuildTools fdroid-builder [
-            haskell-language-server
-            cabal2nix
-            cabal-install
-          ]).env;
+        fdroid-builder-shell-f = inCI:
+          with pkgs;
+          (haskell.lib.addBuildTools fdroid-builder ([ cabal-install ]
+            ++ (if !inCI then [
+              haskell-language-server
+              cabal2nix
+            ] else
+              [ ]))).env;
+        ourShell = inCI:
+          with pkgs;
+          let fdroid-builder-shell = fdroid-builder-shell-f inCI;
+          in (sdk.shell.override {
+            androidStudio = null;
+            generateLocalProperties = false;
+          }).overrideAttrs (old: {
+            buildInputs = old.buildInputs
+              ++ [ plugin-scaffold-exe nvchecker unzip ]
+              ++ fdroid-builder-shell.buildInputs;
+            nativeBuildInputs = old.nativeBuildInputs
+              ++ fdroid-builder-shell.nativeBuildInputs;
+          });
       in with pkgs; {
-        devShells.default = (sdk.shell.override {
-          androidStudio = null;
-          generateLocalProperties = false;
-        }).overrideAttrs (old: {
-          buildInputs = old.buildInputs
-            ++ [ plugin-scaffold-exe nvchecker unzip ]
-            ++ fdroid-builder-shell.buildInputs;
-          nativeBuildInputs = old.nativeBuildInputs
-            ++ fdroid-builder-shell.nativeBuildInputs;
-        });
+        devShells.default = ourShell false;
+        devShells.ci = ourShell true;
         packages.default = haskell.lib.justStaticExecutables fdroid-builder;
       });
 }
