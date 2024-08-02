@@ -15,4 +15,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-           gh workflow run run.yml -f target=deploy --repo ${{ github.repository }}
+           gh workflow run run.yaml -f target=deploy --repo ${{ github.repository }}
