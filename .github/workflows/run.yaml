@@ -1,0 +1,59 @@
+name: Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target to build"
+        required: true
+        type: string
+  pull_request:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v23
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v14
+        with:
+          name: fcitx5-android
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Run fdroid-build
+        env:
+          SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
+          SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
+          SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target || 'build' }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: _build/signed/*.apk
+
+      - name: Read changelog
+        id: changelog
+        if: ${{ hashFiles('_build/changelog.txt') != ''}}
+        run: |
+          echo 'changelog<<EOF' >> $GITHUB_OUTPUT
+          cat _build/changelog.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+          echo "### Changelog :rocket:" >> $GITHUB_STEP_SUMMARY
+          cat _build/changelog.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Telegram message
+        uses: appleboy/telegram-action@master
+        if: ${{ hashFiles('_build/deployed') != ''}}
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            F-Droid repo updated:\n ${{ steps.changelog.outputs.changelog }}

@@ -1,0 +1,44 @@
+cabal-version:   3.0
+name:            fdroid-build
+version:         0.1.0.0
+license:         LGPL-2.1-or-later
+license-file:    LICENSE
+author:          berberman
+maintainer:      berberman@yandex.com
+build-type:      Simple
+
+common warnings
+  ghc-options: -Wall
+
+executable fdroid-build
+  import:           warnings
+  main-is:          Main.hs
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
+  other-modules:
+    Build
+    Config
+    Core
+    Deploy
+    Download
+    FDroidVersion
+    GitCommitTime
+    Nvchecker
+    ShakeExtras
+    Sign
+    Types
+
+  build-depends:
+    , aeson
+    , base
+    , base64-bytestring
+    , binary-instances
+    , bytestring
+    , extra
+    , shake
+    , text
+    , transformers
+    , unordered-containers
+    , vector
+
+  hs-source-dirs:   app
+  default-language: Haskell2010
