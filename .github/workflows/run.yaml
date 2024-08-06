@@ -56,4 +56,5 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            F-Droid repo updated:\n ${{ steps.changelog.outputs.changelog }}
+            F-Droid repo updated:
+            ${{ steps.changelog.outputs.changelog }}
