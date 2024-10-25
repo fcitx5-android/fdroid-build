@@ -30,7 +30,9 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target || 'build' }}
+        run: |
+          nix develop .#ci --command cabal update
+          nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target || 'build' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
