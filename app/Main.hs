@@ -142,7 +142,7 @@ packages = [moegirl, minecraft, zhwiki, wubi98, zhengma, cangjie]
               (pinyinDictPath projectDir </> "minecraft-" <> T.unpack dictVer <.> "dict"),
           descAppNameDebug = "Fcitx5 for Android (minecraft dict | Debug)",
           descAppNameRelease = "Fcitx5 for Android (minecraft dict)",
-          descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.minecraft.org.cn"
+          descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.minecraft.wiki"
         }
     zhwiki =
       PackageDesc
