@@ -21,6 +21,9 @@ jobs:
         with:
           name: fcitx5-android
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+        # Deploy needs IPv6 support
+      - name: Set up WARP
+        uses: fscarmen/warp-on-actions@v1.3
       - name: Run fdroid-build
         env:
           SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
