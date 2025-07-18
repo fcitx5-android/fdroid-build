@@ -1,11 +1,11 @@
-cabal-version:   3.0
-name:            fdroid-build
-version:         0.1.0.0
-license:         LGPL-2.1-or-later
-license-file:    LICENSE
-author:          berberman
-maintainer:      berberman@yandex.com
-build-type:      Simple
+cabal-version: 3.0
+name:          fdroid-build
+version:       0.1.0.0
+license:       LGPL-2.1-or-later
+license-file:  LICENSE
+author:        berberman
+maintainer:    berberman@yandex.com
+build-type:    Simple
 
 common warnings
   ghc-options: -Wall
@@ -23,6 +23,7 @@ executable fdroid-build
     FDroidVersion
     GitCommitTime
     Nvchecker
+    Packages
     ShakeExtras
     Sign
     Types

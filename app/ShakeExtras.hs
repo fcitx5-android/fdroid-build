@@ -14,11 +14,12 @@ import Types
 data ShakeExtras = ShakeExtras
   { packageDesc :: HashMap PackageName PackageDesc,
     packageBuilt :: Var (HashMap PackageName FilePath),
-    packageChangelog :: Var (HashMap PackageName (Maybe FDroidVersion, PackageVersion))
+    packageChangelog :: Var (HashMap PackageName (Maybe FDroidVersion, PackageVersion)),
+    checkFdroidVersion :: Bool
   }
 
-initShakeExtras :: [PackageDesc] -> IO ShakeExtras
-initShakeExtras pkgs = do
+initShakeExtras :: [PackageDesc] -> Bool -> IO ShakeExtras
+initShakeExtras pkgs checkFdroidVersion = do
   packageBuilt <- newVar HMap.empty
   packageChangelog <- newVar HMap.empty
   let packageDesc = HMap.fromList $ map (\p -> (descPackageName p, p)) pkgs
@@ -29,6 +30,11 @@ getShakeExtras =
   getShakeExtra @ShakeExtras >>= \case
     Just v -> pure v
     Nothing -> fail "ShakeExtras not found"
+
+getCheckFdroidVersion :: Action Bool
+getCheckFdroidVersion = do
+  ShakeExtras {..} <- getShakeExtras
+  pure checkFdroidVersion
 
 getPackageDesc :: PackageName -> Action PackageDesc
 getPackageDesc pkgName = do
