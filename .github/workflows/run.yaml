@@ -5,22 +5,26 @@ on:
     inputs:
       target:
         description: "Target to build"
-        required: true
         type: string
+        default: ""
   pull_request:
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - uses: cachix/install-nix-action@v23
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: cachix/cachix-action@v14
         with:
           name: fcitx5-android
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
       - name: Run fdroid-build
         env:
           SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
@@ -32,7 +36,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target || 'build' }}
+          nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
