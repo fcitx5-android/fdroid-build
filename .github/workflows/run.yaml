@@ -6,7 +6,7 @@ on:
       target:
         description: "Target to build"
         type: string
-        default: "--skip-fdroid"
+        default: "build"
   pull_request:
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target }}
+          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target }} ${{ github.event_name == 'pull_request' && '--skip-fdroid' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -53,7 +53,7 @@ jobs:
 
       - name: Read changelog
         id: changelog
-        if: ${{ hashFiles('_build/changelog.txt') != ''}}
+        if: ${{ inputs.target == 'deploy' && hashFiles('_build/changelog.txt') != ''}}
         run: |
           echo 'changelog<<EOF' >> $GITHUB_OUTPUT
           cat _build/changelog.txt >> $GITHUB_OUTPUT
@@ -64,7 +64,7 @@ jobs:
 
       - name: Send Telegram message
         uses: appleboy/telegram-action@master
-        if: ${{ hashFiles('_build/deployed') != ''}}
+        if: ${{ inputs.target == 'deploy' && hashFiles('_build/deployed') != ''}}
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
