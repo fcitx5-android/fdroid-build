@@ -7,7 +7,8 @@ module Core where
 
 import Build
 import Config
-import Control.Monad (void)
+import Control.Monad (join, void)
+import Control.Monad.Extra (whenMaybe)
 import qualified Data.Text as T
 import Development.Shake
 import Development.Shake.Classes
@@ -34,14 +35,16 @@ coreRule = void $ do
   gitCommitTimeRule
   addOracle $ \(Core packageName) -> do
     PackageDesc {..} <- getPackageDesc packageName
-    putInfo $ "Checking f-droid version for " <> T.unpack descPackageName
-    fdroidVersion <- getLatestFDroidVersion packageName
+    checkFdroidVersion <- getCheckFdroidVersion
+    fdroidVersion <- fmap join $ whenMaybe checkFdroidVersion $ do
+      putInfo $ "Checking f-droid version for " <> T.unpack descPackageName
+      getLatestFDroidVersion packageName
     putInfo $ "Checking upstream version for " <> T.unpack descPackageName
     upstreamVersion <- checkVersion descVersionSource
     upstreamVersionName <- descCreateVersionName upstreamVersion
     upstreamVersionCode <- descCreateVersionCode upstreamVersion
     let ver = (upstreamVersion, upstreamVersionName, upstreamVersionCode)
-    if fdroidVersion == Just (upstreamVersionName, upstreamVersionCode)
+    if checkFdroidVersion && (fdroidVersion == Just (upstreamVersionName, upstreamVersionCode))
       then do
         putInfo $ "No new version for " <> T.unpack descPackageName
         pure ()
