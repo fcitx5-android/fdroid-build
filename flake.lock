@@ -7,11 +7,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1752075197,
-        "narHash": "sha256-FVHk0qCZ7oSNXanY725sCR6+r9NMO+QZF90ZvNpLzvs=",
+        "lastModified": 1752848760,
+        "narHash": "sha256-+OUqPCue/YHe4F6fWkcEpHaLMH/ZE0z3n7xCaOURB4A=",
         "owner": "fcitx5-android",
         "repo": "fcitx5-android",
-        "rev": "698f61de3062d2e85528adb105c618b433f53230",
+        "rev": "c68c4578b1c529a804677adab4b665d6f7379fd9",
         "type": "github"
       },
       "original": {
@@ -132,11 +132,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1752076252,
-        "narHash": "sha256-kpTj8z3BY5+AFYmtn0ZsF1PisIIG0XejajdP1O3y4o0=",
+        "lastModified": 1752850269,
+        "narHash": "sha256-GksFCZtsg933BzAWP2rwXZ8Nr8uCgnwF9vX+aqIsgrc=",
         "owner": "fcitx5-android",
         "repo": "plugin-scaffold",
-        "rev": "1f3fd8888df6be7ef1ce6693dba58d0ed1655495",
+        "rev": "8b0fa5a0f7dec702e28c88d7b1e4f713c4c5c63c",
         "type": "github"
       },
       "original": {
