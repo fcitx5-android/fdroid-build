@@ -6,7 +6,8 @@ on:
       target:
         description: "Target to build"
         type: string
-        default: "build"
+        required: true
+        default: "deploy"
   pull_request:
 
 jobs:
@@ -43,7 +44,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target }} ${{ github.event_name == 'pull_request' && '--skip-fdroid' }}
+          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target || 'build' }} ${{ github.event_name == 'pull_request' && '--skip-fdroid' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
