@@ -62,11 +62,13 @@ buildRule = void $ addOracle $ \(Build packageName ver@(_, versionName, versionC
     let releaseDir = root </> "app" </> "build" </> "outputs" </> "apk" </> "release"
     let unsignedApk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <> "-" <> "unsigned" <.> "apk"
         apk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <.> "apk"
-    putInfo $ "Renaming " <> unsignedApk <> " to " <> apk
-    liftIO $ renameFile (releaseDir </> unsignedApk) (releaseDir </> apk)
-    putInfo $ "Copying " <> apk <> " to build directory"
-    liftIO $ createDirectoryIfMissing True (buildDir </> "unsigned")
-    liftIO $ copyFile (releaseDir </> apk) (buildDir </> "unsigned" </> apk)
+    -- putInfo $ "Renaming " <> unsignedApk <> " to " <> apk
+    -- liftIO $ renameFile (releaseDir </> unsignedApk) (releaseDir </> apk)
+    -- putInfo $ "Copying " <> apk <> " to build directory"
+    -- liftIO $ createDirectoryIfMissing True (buildDir </> "unsigned")
+    -- liftIO $ copyFile (releaseDir </> apk) (buildDir </> "unsigned" </> apk)
+    liftIO $ createDirectoryIfMissing True (buildDir </> "signed")
+    liftIO $ copyFile (releaseDir </> apk) (buildDir </> "signed" </> apk)
     pure apk
 
 -- | Returns the name of the apk file located in @buildDir@/unsigned
