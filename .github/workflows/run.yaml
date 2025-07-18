@@ -31,6 +31,7 @@ jobs:
         if: ${{ inputs.target == 'deploy' }}
         uses: fscarmen/warp-on-actions@v1.3
         with:
+          stack: ipv6
           mode: client
 
       - name: Run fdroid-build
