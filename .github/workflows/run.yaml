@@ -6,7 +6,7 @@ on:
       target:
         description: "Target to build"
         type: string
-        default: ""
+        default: "--skip-fdroid"
   pull_request:
 
 jobs:
@@ -27,6 +27,7 @@ jobs:
 
         # Deploy needs IPv6 support
       - name: Set up WARP
+        if: ${{ inputs.target == 'deploy' }}
         uses: fscarmen/warp-on-actions@v1.3
         with:
           mode: client
@@ -42,7 +43,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target }}
+          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
