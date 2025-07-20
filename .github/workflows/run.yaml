@@ -5,8 +5,8 @@ on:
     inputs:
       target:
         description: "Target to build"
-        type: string
         required: true
+        type: string
         default: "deploy"
   pull_request:
 
