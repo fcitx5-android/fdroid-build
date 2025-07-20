@@ -18,7 +18,6 @@ import GHC.Generics (Generic)
 import GitCommitTime
 import Nvchecker
 import ShakeExtras
-import Sign
 import Types
 
 newtype Core = Core PackageName
@@ -31,7 +30,6 @@ coreRule = void $ do
   nvcheckerRule
   fdroidVersionRule
   buildRule
-  signRule
   gitCommitTimeRule
   addOracle $ \(Core packageName) -> do
     PackageDesc {..} <- getPackageDesc packageName

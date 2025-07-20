@@ -25,7 +25,6 @@ executable fdroid-build
     Nvchecker
     Packages
     ShakeExtras
-    Sign
     Types
 
   build-depends:

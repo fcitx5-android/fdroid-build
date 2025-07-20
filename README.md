@@ -54,7 +54,7 @@ If you don't want to use Nix, you can set up the Haskell environment and install
 ### Build all packages
 
 ```bash
-cabal run fdroid-build
+cabal run fdroid-build -- build
 ```
 
 ### Build a specific package
@@ -78,7 +78,7 @@ After running this command, the built APKs will be signed and deployed to our fd
 
 ### Clean build artifacts
 
-Build artifacts are stored in the `_build`, where unsigned and signed APKs are stored in `_build/unsigned` and `_build/signed` directories respectively. To clean these artifacts, run:
+Build artifacts are stored in the `_build/signed` directory. To clean these artifacts, run:
 
 ```bash
 cabal run fdroid-build -- clean
@@ -89,5 +89,5 @@ cabal run fdroid-build -- clean
 By default, the build process checks our fdroid repository version to skip building if the version is already up to date. If you want to skip this check, you can use the `-s` or `--skip-fdroid` flag:
 
 ```bash
-cabal run fdroid-build -- -s
+cabal run fdroid-build -- <target> -s
 ```

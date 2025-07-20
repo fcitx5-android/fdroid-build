@@ -15,7 +15,7 @@ import Development.Shake.Config
 import Development.Shake.FilePath
 import GHC.Generics (Generic)
 import ShakeExtras
-import System.Directory.Extra (copyFile, createDirectoryIfMissing, renameFile)
+import System.Directory.Extra (copyFile, createDirectoryIfMissing)
 import Types
 
 data Build = Build PackageName PackageVersion
@@ -60,13 +60,9 @@ buildRule = void $ addOracle $ \(Build packageName ver@(_, versionName, versionC
     cmd_ (Cwd root) "chmod" "+x" "gradlew"
     cmd_ (Cwd root) "./gradlew" "assembleRelease"
     let releaseDir = root </> "app" </> "build" </> "outputs" </> "apk" </> "release"
-    let unsignedApk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <> "-" <> "unsigned" <.> "apk"
-        apk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <.> "apk"
-    putInfo $ "Renaming " <> unsignedApk <> " to " <> apk
-    liftIO $ renameFile (releaseDir </> unsignedApk) (releaseDir </> apk)
-    putInfo $ "Copying " <> apk <> " to build directory"
-    liftIO $ createDirectoryIfMissing True (buildDir </> "unsigned")
-    liftIO $ copyFile (releaseDir </> apk) (buildDir </> "unsigned" </> apk)
+    let apk = T.unpack packageName <> "-" <> T.unpack versionName <> "-" <> "release" <.> "apk"
+    liftIO $ createDirectoryIfMissing True (buildDir </> "signed")
+    liftIO $ copyFile (releaseDir </> apk) (buildDir </> "signed" </> apk)
     pure apk
 
 -- | Returns the name of the apk file located in @buildDir@/unsigned

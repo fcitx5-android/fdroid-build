@@ -7,25 +7,33 @@ on:
         description: "Target to build"
         required: true
         type: string
+        default: "deploy"
   pull_request:
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - uses: cachix/install-nix-action@v23
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: cachix/cachix-action@v14
         with:
           name: fcitx5-android
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
         # Deploy needs IPv6 support
       - name: Set up WARP
+        if: ${{ inputs.target == 'deploy' }}
         uses: fscarmen/warp-on-actions@v1.3
         with:
+          stack: ipv6
           mode: client
+
       - name: Run fdroid-build
         env:
           SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
@@ -37,7 +45,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run -- fdroid-build ${{ inputs.target || 'build' }}
+          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target || 'build' }} ${{ github.event_name == 'pull_request' && '--skip-fdroid' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -47,7 +55,7 @@ jobs:
 
       - name: Read changelog
         id: changelog
-        if: ${{ hashFiles('_build/changelog.txt') != ''}}
+        if: ${{ inputs.target == 'deploy' && hashFiles('_build/changelog.txt') != ''}}
         run: |
           echo 'changelog<<EOF' >> $GITHUB_OUTPUT
           cat _build/changelog.txt >> $GITHUB_OUTPUT
@@ -58,7 +66,7 @@ jobs:
 
       - name: Send Telegram message
         uses: appleboy/telegram-action@master
-        if: ${{ hashFiles('_build/deployed') != ''}}
+        if: ${{ inputs.target == 'deploy' && hashFiles('_build/deployed') != ''}}
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
