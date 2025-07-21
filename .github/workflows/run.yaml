@@ -41,7 +41,7 @@ jobs:
           SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
