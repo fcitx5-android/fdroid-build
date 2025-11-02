@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: cachix/install-nix-action@v23
+      - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: cachix/cachix-action@v14
+      - uses: cachix/cachix-action@v16
         with:
           name: fcitx5-android
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
         # Deploy needs IPv6 support
       - name: Set up WARP
@@ -36,9 +36,9 @@ jobs:
 
       - name: Run fdroid-build
         env:
-          SIGN_KEY_BASE64: "${{ secrets.SIGN_KEY_BASE64 }}"
-          SIGN_KEY_ALIAS: "${{ secrets.SIGN_KEY_ALIAS }}"
-          SIGN_KEY_PWD: "${{ secrets.SIGN_KEY_PWD }}"
+          SIGN_KEY_BASE64: ${{ secrets.SIGN_KEY_BASE64 }}
+          SIGN_KEY_ALIAS: ${{ secrets.SIGN_KEY_ALIAS }}
+          SIGN_KEY_PWD: ${{ secrets.SIGN_KEY_PWD }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ vars.DEPLOY_USER }}
