@@ -65,11 +65,13 @@ jobs:
           cat _build/changelog.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Send Telegram message
-        uses: appleboy/telegram-action@master
         if: ${{ inputs.target == 'deploy' && hashFiles('_build/deployed') != ''}}
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            F-Droid repo updated:
-            ${{ steps.changelog.outputs.changelog }}
+        run: |
+          curl -X POST https://api.telegram.org/bot${{secrets.TELEGRAM_TOKEN}}/sendMessage \
+              -H "content-type: application/json" \
+              -d @- << EOF
+          {
+              "chat_id": "${{ secrets.TELEGRAM_TO }}",
+              "text": "F-Droid repo updated:\n${{ steps.changelog.outputs.changelog }}"
+          }
+          EOF
