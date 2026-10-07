@@ -1,0 +1,39 @@
+name: Build Pull Request
+
+on:
+  pull_request:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ github.token }}
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: fcitx5-android
+
+      - name: Run fdroid-build
+        env:
+          SIGN_KEY_BASE64: ${{ vars.ANDROID_TEST_KEY_BASE64 }}
+          SIGN_KEY_ALIAS: ${{ vars.ANDROID_TEST_KEY_ALIAS }}
+          SIGN_KEY_PWD: ${{ vars.ANDROID_TEST_KEY_PWD }}
+        run: |
+          nix develop .#ci --command cabal update
+          nix develop .#ci --command cabal run fdroid-build -- build --skip-fdroid
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: _build/signed/*.apk
+
+      - name: Read changelog
+        run: |
+          echo "### Changelog :rocket:" >> $GITHUB_STEP_SUMMARY
+          cat _build/changelog.txt >> $GITHUB_STEP_SUMMARY
