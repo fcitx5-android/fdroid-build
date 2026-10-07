@@ -14,7 +14,7 @@ import Types
 
 --------------------------------------------------------------------------------
 packages :: [PackageDesc]
-packages = [moegirl, minecraft, zhwiki, wubi98, zhengma, cangjie]
+packages = [moegirl, minecraft, zhwiki, zhwikiwebslang, zhwikisource, zhwiktionary, wubi98, zhengma, cangjie]
 
 --------------------------------------------------------------------------------
 
@@ -128,6 +128,75 @@ zhwiki =
       descAppNameDebug = "Fcitx5 for Android (zhwiki dict | Debug)",
       descAppNameRelease = "Fcitx5 for Android (zhwiki dict)",
       descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.wikipedia.org"
+    }
+
+zhwikiwebslang :: PackageDesc
+zhwikiwebslang =
+  PackageDesc
+    { descProjectName = mkProjectName "pinyin-zhwiki-web-slang",
+      descPackageName = mkPackageName "pinyin_zhwiki_web_slang",
+      descVersionSource = ArchLinux "fcitx5-pinyin-zhwiki",
+      -- drop converter version
+      descCreateVersionName = pure . T.takeWhileEnd (/= '.'),
+      -- same as version name, but in integer
+      descCreateVersionCode = readInteger . T.takeWhileEnd (/= '.'),
+      descPreBuild = \(version, dictVer, _) projectDir ->
+        let converterVer = case T.stripSuffix ("." <> dictVer) version of
+              Just v -> v
+              Nothing -> error $ "Invalid version " <> T.unpack version
+            dictName = "web-slang-" <> T.unpack dictVer <.> "dict"
+         in downloadFile
+              (githubReleaseFileUrl "felixonmars" "fcitx5-pinyin-zhwiki" converterVer dictName)
+              (pinyinDictPath projectDir </> dictName),
+      descAppNameDebug = "Fcitx5 for Android (zhwiki web slang dict | Debug)",
+      descAppNameRelease = "Fcitx5 for Android (zhwiki web slang dict dict)",
+      descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.wikipedia.org 中国大陆网络用语列表"
+    }
+
+zhwikisource :: PackageDesc
+zhwikisource =
+  PackageDesc
+    { descProjectName = mkProjectName "pinyin-zhwikisource",
+      descPackageName = mkPackageName "pinyin_zhwikisource",
+      descVersionSource = ArchLinux "fcitx5-pinyin-zhwiki",
+      -- drop converter version
+      descCreateVersionName = pure . T.takeWhileEnd (/= '.'),
+      -- same as version name, but in integer
+      descCreateVersionCode = readInteger . T.takeWhileEnd (/= '.'),
+      descPreBuild = \(version, dictVer, _) projectDir ->
+        let converterVer = case T.stripSuffix ("." <> dictVer) version of
+              Just v -> v
+              Nothing -> error $ "Invalid version " <> T.unpack version
+            dictName = "zhwikisource-" <> T.unpack dictVer <.> "dict"
+         in downloadFile
+              (githubReleaseFileUrl "felixonmars" "fcitx5-pinyin-zhwiki" converterVer dictName)
+              (pinyinDictPath projectDir </> dictName),
+      descAppNameDebug = "Fcitx5 for Android (zhwikisource dict | Debug)",
+      descAppNameRelease = "Fcitx5 for Android (zhwikisource dict)",
+      descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.wikisource.org"
+    }
+
+zhwiktionary :: PackageDesc
+zhwiktionary =
+  PackageDesc
+    { descProjectName = mkProjectName "pinyin-zhwiktionary",
+      descPackageName = mkPackageName "pinyin_zhwiktionary",
+      descVersionSource = ArchLinux "fcitx5-pinyin-zhwiki",
+      -- drop converter version
+      descCreateVersionName = pure . T.takeWhileEnd (/= '.'),
+      -- same as version name, but in integer
+      descCreateVersionCode = readInteger . T.takeWhileEnd (/= '.'),
+      descPreBuild = \(version, dictVer, _) projectDir ->
+        let converterVer = case T.stripSuffix ("." <> dictVer) version of
+              Just v -> v
+              Nothing -> error $ "Invalid version " <> T.unpack version
+            dictName = "zhwiktionary-" <> T.unpack dictVer <.> "dict"
+         in downloadFile
+              (githubReleaseFileUrl "felixonmars" "fcitx5-pinyin-zhwiki" converterVer dictName)
+              (pinyinDictPath projectDir </> dictName),
+      descAppNameDebug = "Fcitx5 for Android (zhwiktionary dict | Debug)",
+      descAppNameRelease = "Fcitx5 for Android (zhwiktionary dict)",
+      descPluginDesc = "Fcitx 5 Pinyin Dictionary from zh.wiktionary.org"
     }
 
 wubi98 :: PackageDesc
