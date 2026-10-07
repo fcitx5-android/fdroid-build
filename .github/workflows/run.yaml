@@ -8,28 +8,26 @@ on:
         required: true
         type: string
         default: "deploy"
-  pull_request:
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          github_access_token: ${{ github.token }}
 
-      - uses: cachix/cachix-action@v16
+      - uses: cachix/cachix-action@v17
         with:
           name: fcitx5-android
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
         # Deploy needs IPv6 support
       - name: Set up WARP
         if: ${{ inputs.target == 'deploy' }}
-        uses: fscarmen/warp-on-actions@v1.3
+        uses: fscarmen/warp-on-actions@v1.4
         with:
           stack: ipv6
           mode: client
@@ -45,10 +43,10 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           nix develop .#ci --command cabal update
-          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target || 'build' }} ${{ github.event_name == 'pull_request' && '--skip-fdroid' || '' }}
+          nix develop .#ci --command cabal run fdroid-build -- ${{ inputs.target || 'build' }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: plugins
           path: _build/signed/*.apk
